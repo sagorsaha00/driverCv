@@ -38,9 +38,11 @@ export default function MatchItem({ label, bg, icon }: MatchItemProps) {
         min-h-[54px]
         items-center
         gap-2
+        cursor-pointer
         px-3
         py-2.5
-        rounded-2xl
+       rounded-bl-2xl
+              rounded-tr-2xl
         ${bg}
       `}
     >

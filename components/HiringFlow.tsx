@@ -116,11 +116,16 @@ export default function HiringFlow() {
                 absolute
                 left-1/2
                 top-0
+                rounded-br-2xl
+                -translate-x-1/2
                 w-[230px]
                 -translate-x-1/2
               "
             >
-              <div className="flex items-center gap-3">
+              <div
+                className="flex    items-center  rounded-bl-2xl
+              rounded-tr-2xl gap-3"
+              >
                 <IconBox color="bg-[#111827]">
                   <BriefcaseBusiness className="h-4 w-4 text-white" />
                 </IconBox>
@@ -144,7 +149,9 @@ export default function HiringFlow() {
               className="
                 absolute
                 left-[2%]
-                top-[23%]
+                top-[15%]
+                 rounded-br-2xl
+              rounded-tl-2xl
                 w-[185px]
               "
             >
@@ -156,10 +163,6 @@ export default function HiringFlow() {
                 <div>
                   <p className="text-[10px] font-bold text-slate-900">
                     Driver Available
-                  </p>
-
-                  <p className="mt-1 text-[9px] text-slate-400">
-                    5 years experience
                   </p>
                 </div>
               </div>
@@ -197,7 +200,7 @@ export default function HiringFlow() {
             >
               {/* Matching title */}
 
-              <div className="mb-4 flex items-center justify-between">
+              <div className="mb-4  flex items-center justify-between">
                 <div>
                   <p
                     className="
@@ -270,12 +273,13 @@ export default function HiringFlow() {
               delay={1.45}
               className="
                 absolute
-                bottom-[17%]
+                bottom-[16%]
                 right-[2%]
+                rounded-tl-2xl
                 w-[205px]
               "
             >
-              <div className="flex items-center gap-3">
+              <div className="flex    items-center gap-3">
                 <IconBox color="bg-[#F5EDFF]">
                   <Building2 className="h-4 w-4 text-purple-600" />
                 </IconBox>
@@ -299,6 +303,8 @@ export default function HiringFlow() {
               className="
                 absolute
                 bottom-[17%]
+                rounded-tr-2xl
+                rounded-bl-2xl
                 left-[2%]
                 w-[190px]
               "
@@ -340,6 +346,7 @@ export default function HiringFlow() {
                 bottom-0
                 left-1/2
                 -translate-x-1/2
+               
               "
             >
               <div
@@ -351,6 +358,9 @@ export default function HiringFlow() {
                 px-7
                 py-3.5
                 text-white
+                 rounded-bl-2xl
+                 rounded-tr-2xl
+                 cursor-pointer
                 shadow-[0_12px_30px_rgba(15,23,42,0.16)]
               "
               >
