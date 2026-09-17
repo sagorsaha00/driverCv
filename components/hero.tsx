@@ -187,10 +187,13 @@ function HeroContent() {
               gap-3
               bg-[#1677E8]
               px-7
+              rounded-m
               py-3.5
               text-[12px]
               font-bold
               text-white
+              rounded-bl-2xl
+              rounded-tr-2xl
               shadow-[0_10px_25px_rgba(22,119,232,0.18)]
             "
           >
@@ -223,6 +226,8 @@ function HeroContent() {
               justify-center
               gap-2
               border
+               rounded-br-2xl
+              rounded-tl-2xl
               border-slate-200
               bg-white
               px-7

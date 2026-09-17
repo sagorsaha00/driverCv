@@ -14,8 +14,8 @@ const sans = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "HaulPath — Find drivers. Find driving jobs.",
-  description: "HaulPath matches verified drivers with companies hiring now.",
+  title: "DriverCv  — Find drivers. Find driving jobs.",
+  description: "Driver Cv matches verified drivers with companies hiring now.",
 };
 
 export default function RootLayout({
