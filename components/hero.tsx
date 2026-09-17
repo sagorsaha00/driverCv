@@ -11,6 +11,7 @@ import {
 import { motion } from "framer-motion";
 import Navbar from "./navbar";
 import HiringFlow from "./HiringFlow";
+import JobSearch from "./JobSearch";
 
 export default function Hero() {
   return (
