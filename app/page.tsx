@@ -17,11 +17,12 @@ export default function HomePage() {
 
       <JobSearch />
       <PopularCategories />
+
       {/* 
 
-      <LatestJobs />
+     
 
-      <HiringCTA />
+ 
 
       <NearbyDrivers />
 

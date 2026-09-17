@@ -7,8 +7,7 @@ import {
   Clock3,
   ArrowRight,
   X,
-  CheckCircle2,
-  Building2,
+  
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { driverJobs } from "@/data/dummyData";
@@ -84,10 +83,10 @@ export default function JobSearch() {
           />
         )}
       </AnimatePresence>
-
-      {/* ================= MAIN SEARCH CONTAINER ================= */}
-      <div className="w-full max-w-4xl mx-auto px-4 sm:px-6">
-        {/* NORMAL INLINE SEARCH BAR (Default State) */}
+ 
+      
+      <div className="w-full max-w-4xl    mx-auto px-4 sm:px-6">
+        
         {!isFocused && (
           <div
             onClick={() => setIsFocused(true)}
