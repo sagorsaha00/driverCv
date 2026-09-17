@@ -4,7 +4,7 @@ import Hero from "@/components/hero";
 import HiringCTA from "@/components/HiringCTA";
 import HowItWorks from "@/components/HowItWorks";
 import JobSearch from "@/components/JobSearch";
-import LatestJobs from "@/components/LatestJobs";
+ 
 import NearbyDrivers from "@/components/NearbyDrivers";
 import PopularCategories from "@/components/PopularCategories";
 
