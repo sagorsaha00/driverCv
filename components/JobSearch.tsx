@@ -18,9 +18,11 @@ export default function JobSearch() {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedLocation, setSelectedLocation] = useState("");
   const [selectedTime, setSelectedTime] = useState("");
-  const searchRef = useRef<HTMLDivElement>(null);
 
-  // Close dropdown on outside click
+  const searchRef = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  // Close dropdown on outside click or ESC key
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
       if (
@@ -30,9 +32,29 @@ export default function JobSearch() {
         setIsFocused(false);
       }
     }
+
+    function handleKeyDown(event: KeyboardEvent) {
+      if (event.key === "Escape") {
+        setIsFocused(false);
+      }
+    }
+
     document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
+    document.addEventListener("keydown", handleKeyDown);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+      document.removeEventListener("keydown", handleKeyDown);
+    };
   }, []);
+
+  // Auto focus input when modal expands
+  useEffect(() => {
+    if (isFocused) {
+      setTimeout(() => {
+        inputRef.current?.focus();
+      }, 100);
+    }
+  }, [isFocused]);
 
   // Filter Jobs based on input
   const filteredJobs = driverJobs.filter((job) => {
@@ -57,78 +79,119 @@ export default function JobSearch() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-40 bg-slate-900/30 backdrop-blur-md transition-all duration-300"
+            onClick={() => setIsFocused(false)}
+            className="fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-md transition-all"
           />
         )}
       </AnimatePresence>
 
-      {/* ================= SEARCH CONTAINER ================= */}
-      <section className="relative z-50 ml-26 -mt-30 px-4 sm:mr-12 sm:px-6 lg:px-8">
-        <div className="mx-auto max-w-[960px]" ref={searchRef}>
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
-            className={`relative rounded-2xl bg-white p-2 border transition-all duration-300 ${
-              isFocused
-                ? "border-[#1677E8] shadow-[0_20px_60px_rgba(22,119,232,0.25)] ring-4 ring-[#1677E8]/10"
-                : "border-slate-200 shadow-[0_12px_40px_rgba(15,23,42,0.08)] hover:border-slate-300"
-            }`}
+      {/* ================= MAIN SEARCH CONTAINER ================= */}
+      <div className="w-full max-w-4xl mx-auto px-4 sm:px-6">
+        {/* NORMAL INLINE SEARCH BAR (Default State) */}
+        {!isFocused && (
+          <div
+            onClick={() => setIsFocused(true)}
+            className="group cursor-pointer rounded-2xl border border-slate-200 bg-white p-2 shadow-[0_12px_40px_rgba(15,23,42,0.08)] transition-all hover:border-slate-300"
           >
-            <div className="grid grid-cols-1 md:grid-cols-[1.3fr_1fr_0.8fr_auto]">
-              {/* Query Field */}
+            <div className="grid grid-cols-1 gap-2 md:grid-cols-[1.3fr_1fr_0.8fr_auto] md:gap-0">
               <SearchFieldInput
                 icon={<Search className="h-4 w-4" />}
                 label="Job Title or Category"
                 placeholder="Truck, delivery, bus..."
                 value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                onFocus={() => setIsFocused(true)}
-                onClear={() => setSearchQuery("")}
+                readOnly
               />
-
-              {/* Location Select */}
               <LocationSelectField
                 icon={<MapPin className="h-4 w-4" />}
                 label="Location"
                 value={selectedLocation}
-                onChange={(e) => setSelectedLocation(e.target.value)}
-                onFocus={() => setIsFocused(true)}
+                readOnly
               />
-
-              {/* Time Posted Select */}
               <TimeSelectField
                 icon={<Clock3 className="h-4 w-4" />}
                 label="Posted"
                 value={selectedTime}
-                onChange={(e) => setSelectedTime(e.target.value)}
-                onFocus={() => setIsFocused(true)}
+                readOnly
               />
-
-              {/* Submit Button */}
-              <motion.button
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
-                onClick={() => setIsFocused(true)}
-                className="flex min-h-[58px] items-center justify-center gap-2 rounded-xl bg-[#1677E8] px-7 text-[13px] font-bold text-white shadow-lg shadow-[#1677E8]/25 transition-colors hover:bg-[#0967D6]"
-              >
+              <div className="flex min-h-[52px] md:min-h-[58px] items-center justify-center gap-2 rounded-xl bg-[#1677E8] px-7 text-[13px] font-bold text-white shadow-lg shadow-[#1677E8]/25">
                 Search
                 <ArrowRight className="h-4 w-4" />
-              </motion.button>
+              </div>
             </div>
+          </div>
+        )}
 
-            {/* ================= LIVE SEARCH RESULTS DROPDOWN ================= */}
-            <AnimatePresence>
-              {isFocused && (
-                <SearchResultsDropdown
-                  jobs={filteredJobs}
-                  onClose={() => setIsFocused(false)}
-                />
-              )}
-            </AnimatePresence>
-          </motion.div>
-        </div>
-      </section>
+        {/* CENTERED POPUP MODAL (Active Clicked State) */}
+        <AnimatePresence>
+          {isFocused && (
+            <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6">
+              <motion.div
+                ref={searchRef}
+                initial={{ opacity: 0, scale: 0.95, y: 10 }}
+                animate={{ opacity: 1, scale: 1, y: 0 }}
+                exit={{ opacity: 0, scale: 0.95, y: 10 }}
+                transition={{ duration: 0.2, ease: "easeOut" }}
+                className="relative w-full max-w-2xl max-h-[90vh] overflow-y-auto rounded-3xl border border-[#1677E8]/30 bg-white p-4 sm:p-6 shadow-[0_25px_70px_rgba(0,0,0,0.3)] ring-4 ring-[#1677E8]/10"
+              >
+                {/* Modal Header / Close */}
+                <div className="mb-3 flex items-center justify-between border-b border-slate-100 pb-2 px-1">
+                  <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400">
+                    Search Drivers & Jobs
+                  </span>
+                  <button
+                    onClick={() => setIsFocused(false)}
+                    className="flex h-8 w-8 items-center justify-center rounded-full bg-slate-100 text-slate-500 hover:bg-slate-200"
+                  >
+                    <X className="h-4 w-4" />
+                  </button>
+                </div>
+
+                {/* Search Input Fields Container */}
+                <div className="flex flex-col gap-2 rounded-2xl bg-slate-50/80 p-2 border border-slate-100">
+                  <SearchFieldInput
+                    icon={<Search className="h-4 w-4" />}
+                    label="Job Title or Category"
+                    placeholder="Truck, delivery, bus..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    inputRef={inputRef}
+                    onClear={() => setSearchQuery("")}
+                  />
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                    <LocationSelectField
+                      icon={<MapPin className="h-4 w-4" />}
+                      label="Location"
+                      value={selectedLocation}
+                      onChange={(e) => setSelectedLocation(e.target.value)}
+                    />
+
+                    <TimeSelectField
+                      icon={<Clock3 className="h-4 w-4" />}
+                      label="Posted"
+                      value={selectedTime}
+                      onChange={(e) => setSelectedTime(e.target.value)}
+                    />
+                  </div>
+                </div>
+
+                {/* Search Button */}
+                <motion.button
+                  whileHover={{ scale: 1.01 }}
+                  whileTap={{ scale: 0.99 }}
+                  className="mt-3 flex w-full min-h-[50px] items-center justify-center gap-2 rounded-xl bg-[#1677E8] px-7 text-[14px] font-bold text-white shadow-lg shadow-[#1677E8]/25 transition-colors hover:bg-[#0967D6]"
+                >
+                  Search Jobs
+                  <ArrowRight className="h-4 w-4" />
+                </motion.button>
+
+                {/* Live Search Results */}
+                <SearchResultsDropdown jobs={filteredJobs} />
+              </motion.div>
+            </div>
+          )}
+        </AnimatePresence>
+      </div>
     </>
   );
 }
@@ -140,11 +203,12 @@ export default function JobSearch() {
 interface SearchFieldInputProps {
   icon: React.ReactNode;
   label: string;
-  placeholder: string;
+  placeholder?: string;
   value: string;
-  onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
-  onFocus: () => void;
-  onClear: () => void;
+  onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  onClear?: () => void;
+  inputRef?: React.RefObject<HTMLInputElement | null>;
+  readOnly?: boolean;
 }
 
 function SearchFieldInput({
@@ -153,29 +217,31 @@ function SearchFieldInput({
   placeholder,
   value,
   onChange,
-  onFocus,
   onClear,
+  inputRef,
+  readOnly = false,
 }: SearchFieldInputProps) {
   return (
-    <div className="flex min-h-[58px] items-center gap-3 border-b border-slate-100 px-4 md:border-b-0 md:border-r">
-      <div className="text-[#1677E8]">{icon}</div>
-      <div className="flex-1">
+    <div className="flex min-h-[52px] items-center gap-3 rounded-xl bg-white px-3 border border-slate-100 md:border-none">
+      <div className="text-[#1677E8] shrink-0">{icon}</div>
+      <div className="flex-1 min-w-0">
         <label className="block text-[9px] font-bold uppercase tracking-wider text-slate-400">
           {label}
         </label>
         <div className="relative flex items-center">
           <input
+            ref={inputRef}
             type="text"
+            readOnly={readOnly}
             value={value}
             onChange={onChange}
-            onFocus={onFocus}
             placeholder={placeholder}
             className="w-full border-none bg-transparent p-0 text-[13px] font-semibold text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-0"
           />
-          {value && (
+          {value && !readOnly && onClear && (
             <button
               onClick={onClear}
-              className="text-slate-400 hover:text-slate-600"
+              className="text-slate-400 hover:text-slate-600 shrink-0 ml-1"
             >
               <X className="h-3.5 w-3.5" />
             </button>
@@ -190,12 +256,12 @@ function SearchFieldInput({
    DESTRUCTURED LOCATION SELECT FIELD
 ============================================================ */
 
-interface LocationSelectProps {
+interface SelectProps {
   icon: React.ReactNode;
   label: string;
   value: string;
-  onChange: (e: React.ChangeEvent<HTMLSelectElement>) => void;
-  onFocus: () => void;
+  onChange?: (e: React.ChangeEvent<HTMLSelectElement>) => void;
+  readOnly?: boolean;
 }
 
 function LocationSelectField({
@@ -203,20 +269,20 @@ function LocationSelectField({
   label,
   value,
   onChange,
-  onFocus,
-}: LocationSelectProps) {
+  readOnly = false,
+}: SelectProps) {
   return (
-    <div className="flex min-h-[58px] items-center gap-3 border-b border-slate-100 px-4 md:border-b-0 md:border-r">
-      <div className="text-[#1677E8]">{icon}</div>
-      <div className="flex-1">
+    <div className="flex min-h-[52px] items-center gap-3 rounded-xl bg-white px-3 border border-slate-100 md:border-none">
+      <div className="text-[#1677E8] shrink-0">{icon}</div>
+      <div className="flex-1 min-w-0">
         <label className="block text-[9px] font-bold uppercase tracking-wider text-slate-400">
           {label}
         </label>
         <select
+          disabled={readOnly}
           value={value}
           onChange={onChange}
-          onFocus={onFocus}
-          className="w-full cursor-pointer border-none bg-transparent p-0 text-[13px] font-semibold text-slate-900 focus:outline-none focus:ring-0"
+          className="w-full cursor-pointer border-none bg-transparent p-0 text-[13px] font-semibold text-slate-900 focus:outline-none focus:ring-0 disabled:opacity-100"
         >
           <option value="">All Sweden</option>
           <option value="Stockholm">Stockholm</option>
@@ -230,29 +296,25 @@ function LocationSelectField({
   );
 }
 
-/* ============================================================
-   DESTRUCTURED TIME SELECT FIELD
-============================================================ */
-
 function TimeSelectField({
   icon,
   label,
   value,
   onChange,
-  onFocus,
-}: LocationSelectProps) {
+  readOnly = false,
+}: SelectProps) {
   return (
-    <div className="flex min-h-[58px] items-center gap-3 border-b border-slate-100 px-4 md:border-b-0 md:border-r">
-      <div className="text-[#1677E8]">{icon}</div>
-      <div className="flex-1">
+    <div className="flex min-h-[52px] items-center gap-3 rounded-xl bg-white px-3 border border-slate-100 md:border-none">
+      <div className="text-[#1677E8] shrink-0">{icon}</div>
+      <div className="flex-1 min-w-0">
         <label className="block text-[9px] font-bold uppercase tracking-wider text-slate-400">
           {label}
         </label>
         <select
+          disabled={readOnly}
           value={value}
           onChange={onChange}
-          onFocus={onFocus}
-          className="w-full cursor-pointer border-none bg-transparent p-0 text-[13px] font-semibold text-slate-900 focus:outline-none focus:ring-0"
+          className="w-full cursor-pointer border-none bg-transparent p-0 text-[13px] font-semibold text-slate-900 focus:outline-none focus:ring-0 disabled:opacity-100"
         >
           <option value="">Any time</option>
           <option value="24h">Past 24 hours</option>
@@ -264,80 +326,16 @@ function TimeSelectField({
   );
 }
 
-/* ============================================================
-   DESTRUCTURED DROPDOWN SEARCH RESULTS
-============================================================ */
-
 interface SearchResultsDropdownProps {
   jobs: typeof driverJobs;
-  onClose: () => void;
 }
 
-function SearchResultsDropdown({ jobs, onClose }: SearchResultsDropdownProps) {
+function SearchResultsDropdown({ jobs }: SearchResultsDropdownProps) {
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 10 }}
-      animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, y: 10 }}
-      transition={{ duration: 0.2 }}
-      className="absolute left-0 right-0 top-full mt-3 overflow-hidden rounded-2xl border border-slate-200/80 bg-white/95 p-4 shadow-2xl backdrop-blur-xl"
-    >
-      <div className="mb-3 flex items-center justify-between px-2">
-        <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400">
-          Matching Driver Jobs ({jobs.length})
-        </span>
-        <button
-          onClick={onClose}
-          className="text-xs font-semibold text-slate-400 hover:text-slate-600"
-        >
-          Esc to close
-        </button>
-      </div>
-
-      <div className="max-h-[320px] space-y-2 overflow-y-auto pr-1">
-        {jobs.length > 0 ? (
-          jobs.map((job) => (
-            <div
-              key={job.id}
-              className="group flex cursor-pointer items-center justify-between rounded-xl border border-slate-100 bg-slate-50/50 p-3.5 transition-all hover:border-[#1677E8]/30 hover:bg-[#1677E8]/5"
-            >
-              <div className="flex items-center gap-3">
-                <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-blue-100 text-[#1677E8]">
-                  <Building2 className="h-5 w-5" />
-                </div>
-                <div>
-                  <div className="flex items-center gap-2">
-                    <h4 className="text-[13px] font-bold text-slate-900 group-hover:text-[#1677E8]">
-                      {job.title}
-                    </h4>
-                    {job.verified && (
-                      <span className="flex items-center gap-1 rounded-full bg-emerald-50 px-2 py-0.5 text-[10px] font-medium text-emerald-600 border border-emerald-100">
-                        <CheckCircle2 className="h-3 w-3" /> Verified
-                      </span>
-                    )}
-                  </div>
-                  <p className="text-[11px] text-slate-500">
-                    {job.company} • {job.location}, Sweden
-                  </p>
-                </div>
-              </div>
-
-              <div className="text-right">
-                <span className="block text-[12px] font-bold text-slate-900">
-                  {job.salary}
-                </span>
-                <span className="text-[10px] text-slate-400">{job.type}</span>
-              </div>
-            </div>
-          ))
-        ) : (
-          <div className="py-8 text-center text-slate-400">
-            <p className="text-xs font-semibold">
-              No driver jobs found in Sweden for this search.
-            </p>
-          </div>
-        )}
-      </div>
-    </motion.div>
+    <div className="mt-3">
+      <p className="text-xs text-slate-400 px-1 mb-2 font-medium">
+        Matching Results: {jobs.length}
+      </p>
+    </div>
   );
 }
