@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Oswald, Inter } from "next/font/google";
 import "./globals.css";
+import Navbar from "@/components/navbar";
 
 const display = Oswald({
   subsets: ["latin"],
@@ -28,6 +29,7 @@ export default function RootLayout({
       <body
         className={`${display.variable} ${sans.variable} bg-cream font-sans text-ink antialiased`}
       >
+        <Navbar />
         {children}
       </body>
     </html>

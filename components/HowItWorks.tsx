@@ -1,141 +1,81 @@
 "use client";
 
-import { Search, UsersRound, MessageCircle } from "lucide-react";
-
 import { motion } from "framer-motion";
+import { Search, Users, ShieldCheck } from "lucide-react";
 
 const steps = [
   {
     number: "01",
-    title: "Describe your need",
-    text: "Tell us the driver, location, experience and requirements.",
     icon: Search,
+    title: "Describe Your Needs",
+    description:
+      "Select vehicle type, location, working hours, pay rate, and whether a vehicle is provided.",
   },
-
   {
     number: "02",
-    title: "Match the right driver",
-    text: "Browse profiles that match your job requirements.",
-    icon: UsersRound,
+    icon: Users,
+    title: "Match the Right Driver",
+    description:
+      "Receive applications from verified drivers with the exact license class and availability.",
   },
-
   {
     number: "03",
-    title: "Connect and hire",
-    text: "Talk directly, review details and make your hire.",
-    icon: MessageCircle,
+    icon: ShieldCheck,
+    title: "Contact & Choose",
+    description:
+      "Review profiles, chat directly, and agree on terms with your selected driver hassle-free.",
   },
 ];
 
-export default function HowItWorks() {
+export default function HowItWorksSection() {
   return (
-    <section
-      id="how-it-works"
-      className="bg-[#F5F8FC] px-5 py-16 sm:px-8 lg:px-10"
-    >
-      <div className="mx-auto max-w-[900px]">
-        <div className="text-center">
-          <p
-            className="
-            text-[9px]
-            font-bold
-            uppercase
-            tracking-[0.2em]
-            text-[#1677E8]
-          "
-          >
-            Simple for everyone
-          </p>
-
-          <h2
-            className="
-            mt-2
-            text-[27px]
-            font-black
-            tracking-[-0.04em]
-            text-[#101828]
-          "
-          >
-            Hiring made simpler
+    <section className="bg-slate-50/60 py-16 sm:py-24">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        {/* Section Heading */}
+        <motion.div
+          initial={{ opacity: 0, y: 15 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          className="text-center"
+        >
+          <span className="text-[10px] font-bold uppercase tracking-widest text-[#2563EB]">
+            — HOW IT WORKS
+          </span>
+          <h2 className="mt-2 font-display text-2xl font-black text-slate-900 sm:text-4xl">
+            Easier for Both Sides
           </h2>
-        </div>
+        </motion.div>
 
-        <div className="mt-8 grid gap-3 md:grid-cols-3">
+        {/* 3 Steps Grid */}
+        <div className="mt-12 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {steps.map((step, index) => {
-            const Icon = step.icon;
-
+            const IconComponent = step.icon;
             return (
               <motion.div
-                key={step.number}
-                initial={{
-                  opacity: 0,
-                  y: 15,
-                }}
-                whileInView={{
-                  opacity: 1,
-                  y: 0,
-                }}
-                viewport={{
-                  once: true,
-                }}
-                transition={{
-                  duration: 0.45,
-                  delay: index * 0.08,
-                }}
-                className="
-                  relative
-                  border
-                  border-slate-200
-                  bg-white
-                  p-5
-                "
+                key={index}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: index * 0.15 }}
+                whileHover={{ y: -5 }}
+                className="relative overflow-hidden rounded-2xl border border-slate-200/80 bg-white p-6 shadow-sm transition-all hover:shadow-md"
               >
-                <div className="flex items-start justify-between">
-                  <div
-                    className="
-                    flex
-                    h-9
-                    w-9
-                    items-center
-                    justify-center
-                    bg-[#EEF4FF]
-                    text-[#1677E8]
-                  "
-                  >
-                    <Icon className="h-4 w-4" />
-                  </div>
+                {/* Step Number Backdrop */}
+                <span className="absolute right-5 top-4 font-display text-2xl font-black text-slate-200/80">
+                  {step.number}
+                </span>
 
-                  <span
-                    className="
-                    text-[20px]
-                    font-black
-                    text-slate-200
-                  "
-                  >
-                    {step.number}
-                  </span>
+                {/* Icon Box */}
+                <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-blue-50 text-[#2563EB]">
+                  <IconComponent className="h-5 w-5" />
                 </div>
 
-                <h3
-                  className="
-                  mt-7
-                  text-[12px]
-                  font-bold
-                  text-slate-900
-                "
-                >
+                {/* Content */}
+                <h3 className="mt-5 text-sm font-bold text-slate-900">
                   {step.title}
                 </h3>
-
-                <p
-                  className="
-                  mt-2
-                  text-[10px]
-                  leading-5
-                  text-slate-400
-                "
-                >
-                  {step.text}
+                <p className="mt-2 text-xs font-medium leading-relaxed text-slate-500">
+                  {step.description}
                 </p>
               </motion.div>
             );

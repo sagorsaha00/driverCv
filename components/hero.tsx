@@ -1,300 +1,94 @@
 "use client";
 
-import {
-  ArrowRight,
-  Building2,
-  CarFront,
-  CheckCircle2,
-  BriefcaseBusiness,
-  UserRound,
-} from "lucide-react";
 import { motion } from "framer-motion";
-import Navbar from "./navbar";
-import HiringFlow from "./HiringFlow";
-import JobSearch from "./JobSearch";
+import { Search, MapPin, ArrowRight, ShieldCheck } from "lucide-react";
 
-export default function Hero() {
+export default function HeroSection() {
   return (
-    <main className="w-full bg-white text-[#111827]">
-      <Navbar />
-
-      {/* ================= HERO ================= */}
-
-      <section
-        id="home"
-        className="relative min-h-[calc(100vh-76px)] overflow-hidden"
-      >
-        {/* Subtle vertical grid */}
-
-        <div className="pointer-events-none absolute inset-0">
-          <div className="mx-auto grid h-full max-w-[1500px] grid-cols-2 md:grid-cols-3 lg:grid-cols-5">
-            <div className="border-r border-slate-100" />
-
-            <div className="hidden border-r border-slate-100 md:block" />
-
-            <div className="hidden border-r border-slate-100 lg:block" />
-
-            <div className="hidden border-r border-slate-100 lg:block" />
-
-            <div />
-          </div>
-        </div>
-
-        {/* Main Content */}
-
-        <div className="relative z-10 mx-auto grid min-h-[calc(100vh-76px)] max-w-[1500px] grid-cols-1 lg:grid-cols-2">
-          {/* ================= LEFT ================= */}
-
-          <HeroContent />
-
-          {/* ================= RIGHT ================= */}
-
-          <HiringFlow />
-        </div>
-      </section>
-    </main>
-  );
-}
-
-/* ============================================================
-   LEFT HERO CONTENT
-============================================================ */
-
-function HeroContent() {
-  return (
-    <div className="flex items-center border-slate-100 px-6 py-16 sm:px-10 lg:border-r lg:px-16 xl:px-20">
-      <div className="w-full max-w-[620px]">
-        {/* Small Label */}
-
+    <section className="relative overflow-hidden bg-gradient-to-b from-blue-50/60 via-white to-white py-12 lg:py-20">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        {/* Main Heading */}
         <motion.div
-          initial={{
-            opacity: 0,
-            y: 10,
-          }}
-          animate={{
-            opacity: 1,
-            y: 0,
-          }}
-          transition={{
-            duration: 0.5,
-          }}
-          className="mb-7 flex items-center gap-2"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+          className="mx-auto max-w-3xl text-center"
         >
-          <span className="h-1.5 w-1.5 bg-emerald-500" />
-
-          <span className="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-400">
-            Driver hiring marketplace
+          <span className="inline-flex items-center gap-1.5 rounded-full bg-blue-100/60 px-3 py-1 text-[11px] font-bold uppercase tracking-wider text-[#2563EB]">
+            <ShieldCheck className="h-3.5 w-3.5" />
+            Verified Professional Drivers
           </span>
+
+          <h1 className="mt-4 font-display text-3xl font-black tracking-tight text-slate-900 sm:text-5xl lg:text-6xl">
+            Find Right Drivers. <br />
+            <span className="text-[#2563EB]">On Your Terms.</span>
+          </h1>
+
+          <p className="mt-4 text-xs font-medium leading-relaxed text-slate-500 sm:text-sm md:text-base">
+            Need a driver for a day, or looking for a full-time driving job?
+            DriverCVs seamlessly connects verified drivers with top companies.
+          </p>
+
+          <div className="mt-6 flex flex-col justify-center gap-3 sm:flex-row">
+            <button className="rounded-full bg-[#2563EB] px-6 py-3 text-xs font-bold text-white shadow-lg shadow-blue-500/25 transition-all hover:bg-blue-700">
+              I Need a Driver →
+            </button>
+            <button className="rounded-full border border-slate-200 bg-white px-6 py-3 text-xs font-bold text-slate-700 transition-all hover:bg-slate-50">
+              I Am a Driver
+            </button>
+          </div>
         </motion.div>
 
-        {/* Heading */}
-
-        <motion.h1
-          initial={{
-            opacity: 0,
-            y: 20,
-          }}
-          animate={{
-            opacity: 1,
-            y: 0,
-          }}
-          transition={{
-            duration: 0.7,
-            ease: "easeOut",
-          }}
-          className="
-            text-[58px]
-            font-black
-            leading-[0.88]
-            tracking-[-0.07em]
-            text-[#101820]
-
-            sm:text-[72px]
-
-            lg:text-[78px]
-
-            xl:text-[92px]
-          "
-        >
-          Hiring
-          <br />
-          <span className="font-light text-[#9AA8B9]">Drivers</span>
-          <br />
-          <span className="font-light text-[#9AA8B9]">Made Easy</span>
-        </motion.h1>
-
-        {/* Description */}
-
-        <motion.p
-          initial={{
-            opacity: 0,
-            y: 15,
-          }}
-          animate={{
-            opacity: 1,
-            y: 0,
-          }}
-          transition={{
-            duration: 0.6,
-            delay: 0.15,
-          }}
-          className="
-            mt-8
-            max-w-[440px]
-            text-[14px]
-            leading-[1.7]
-            text-slate-500
-
-            sm:text-[15px]
-          "
-        >
-          Companies post driver jobs and discover qualified candidates. Drivers
-          find real opportunities and connect directly with companies ready to
-          hire.
-        </motion.p>
-
-        {/* Buttons */}
-
+        {/* Floating Search Container */}
         <motion.div
-          initial={{
-            opacity: 0,
-            y: 15,
-          }}
-          animate={{
-            opacity: 1,
-            y: 0,
-          }}
-          transition={{
-            duration: 0.6,
-            delay: 0.25,
-          }}
-          className="mt-8 flex flex-col gap-3 sm:flex-row"
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.2 }}
+          className="mx-auto mt-10 max-w-4xl rounded-2xl border border-slate-200/80 bg-white/90 p-3 sm:p-4 shadow-xl shadow-slate-200/50 backdrop-blur-md"
         >
-          {/* Find Jobs */}
+          <div className="grid grid-cols-1 gap-2.5 sm:grid-cols-12">
+            <div className="flex items-center gap-2 rounded-xl bg-slate-50 px-3.5 py-3 border border-slate-100 sm:col-span-5">
+              <Search className="h-4 w-4 shrink-0 text-slate-400" />
+              <input
+                type="text"
+                placeholder="Title, license type, skill..."
+                className="w-full bg-transparent text-xs text-slate-800 focus:outline-none"
+              />
+            </div>
 
-          <motion.a
-            href="#drivers"
-            whileHover={{
-              y: -2,
-            }}
-            whileTap={{
-              scale: 0.98,
-            }}
-            className="
-              group
-              flex
-              items-center
-              justify-center
-              gap-3
-              bg-[#7393B3]
-              px-7
-              rounded-m
-              py-3.5
-              text-[12px]
-              font-bold
-              text-white
-              rounded-bl-2xl
-              rounded-tr-2xl
-              shadow-[0_10px_25px_rgba(22,119,232,0.18)]
-            "
-          >
-            Find Driving Jobs
-            <motion.span
-              initial={{
-                x: 0,
-              }}
-              whileHover={{
-                x: 4,
-              }}
-            >
+            <div className="flex items-center gap-2 rounded-xl bg-slate-50 px-3.5 py-3 border border-slate-100 sm:col-span-4">
+              <MapPin className="h-4 w-4 shrink-0 text-slate-400" />
+              <input
+                type="text"
+                placeholder="Stockholm, Sweden"
+                className="w-full bg-transparent text-xs text-slate-800 focus:outline-none"
+              />
+            </div>
+
+            <button className="flex items-center justify-center gap-2 rounded-xl bg-[#2563EB] py-3 text-xs font-bold text-white shadow-sm transition-all hover:bg-blue-700 sm:col-span-3">
+              <span>Search Now</span>
               <ArrowRight className="h-4 w-4" />
-            </motion.span>
-          </motion.a>
-
-          {/* Hire */}
-
-          <motion.a
-            href="#post-job"
-            whileHover={{
-              y: -2,
-            }}
-            whileTap={{
-              scale: 0.98,
-            }}
-            className="
-              flex
-              items-center
-              justify-center
-              gap-2
-              border
-               rounded-br-2xl
-              rounded-tl-2xl
-              border-slate-200
-              bg-white
-              px-7
-              py-3.5
-              text-[12px]
-              font-bold
-              text-slate-700
-              transition-colors
-              hover:border-slate-400
-            "
-          >
-            <BriefcaseBusiness className="h-4 w-4" />
-            Hire a Driver
-          </motion.a>
-        </motion.div>
-
-        {/* Small trust row */}
-
-        <motion.div
-          initial={{
-            opacity: 0,
-          }}
-          animate={{
-            opacity: 1,
-          }}
-          transition={{
-            duration: 0.6,
-            delay: 0.4,
-          }}
-          className="mt-12 flex items-center gap-6 border-t border-slate-100 pt-7"
-        >
-          <div className="flex -space-x-2">
-            <Avatar color="bg-blue-100" />
-
-            <Avatar color="bg-emerald-100" />
-
-            <Avatar color="bg-orange-100" />
-
-            <Avatar color="bg-purple-100" />
+            </button>
           </div>
 
-          <div>
-            <p className="text-[11px] font-bold text-slate-700">
-              Drivers & companies
-            </p>
-
-            <p className="mt-0.5 text-[10px] text-slate-400">
-              Connecting directly
-            </p>
+          {/* Popular License Categories */}
+          <div className="mt-3 flex flex-wrap items-center justify-center gap-2 pt-3 border-t border-slate-100">
+            {[
+              "Class CE Heavy Truck",
+              "Delivery Van",
+              "Personal Chauffeur",
+              "Bus Driver (Class D)",
+            ].map((cat, i) => (
+              <span
+                key={i}
+                className="cursor-pointer rounded-lg bg-slate-100 px-3 py-1 text-[11px] font-semibold text-slate-600 transition-colors hover:bg-blue-50 hover:text-[#2563EB]"
+              >
+                {cat}
+              </span>
+            ))}
           </div>
         </motion.div>
       </div>
-    </div>
-  );
-}
-
-/* ============================================================
-   AVATAR
-============================================================ */
-
-function Avatar({ color }: { color: string }) {
-  return (
-    <div
-      className={`flex h-8 w-8 items-center justify-center border-2 border-white ${color}`}
-    >
-      <UserRound className="h-3.5 w-3.5 text-slate-600" />
-    </div>
+    </section>
   );
 }
