@@ -45,8 +45,8 @@ export default function Navbar() {
         {/* ================= ACTION BUTTON & MOBILE TOGGLE ================= */}
         <div className="flex items-center gap-4">
           <a
-            href="#post-job"
-            className="hidden rounded-lg bg-[#1D70F5] px-5 py-2.5 text-[13px] font-semibold text-white shadow-sm transition-all duration-200 hover:bg-blue-600 active:scale-[0.98] sm:block"
+            href="/PostDriverJob"
+            className="hidden rounded-lg bg-[#7393B3] px-5 py-2.5 text-[13px] font-semibold text-white shadow-sm transition-all duration-200  hover:bg-[#7393B3]  active:scale-[0.98] sm:block"
           >
             Post a Driver Job
           </a>
@@ -88,7 +88,7 @@ export default function Navbar() {
                 </a>
               ))}
               <a
-                href="#post-job"
+                href="/PostDriverJob"
                 onClick={() => setMobileMenuOpen(false)}
                 className="mt-2 w-full rounded-lg bg-[#1D70F5] py-3 text-center text-[14px] font-semibold text-white shadow-sm"
               >

@@ -186,7 +186,7 @@ function HeroContent() {
               items-center
               justify-center
               gap-3
-              bg-[#1677E8]
+              bg-[#7393B3]
               px-7
               rounded-m
               py-3.5

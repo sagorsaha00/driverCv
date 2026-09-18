@@ -112,7 +112,7 @@ export default function JobSearch() {
                 value={selectedTime}
                 readOnly
               />
-              <div className="flex min-h-[52px] md:min-h-[58px] items-center justify-center gap-2 rounded-xl bg-[#1677E8] px-7 text-[13px] font-bold text-white shadow-lg shadow-[#1677E8]/25">
+              <div className="flex min-h-[52px] md:min-h-[58px] items-center justify-center gap-2 rounded-xl bg-[#6082B6] px-7 text-[13px] font-bold text-white shadow-lg shadow-[#1677E8]/25">
                 Search
                 <ArrowRight className="h-4 w-4" />
               </div>
