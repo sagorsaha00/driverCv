@@ -15,8 +15,13 @@ import {
   ArrowRight,
   ArrowLeft,
   CheckCircle2,
+  MapPin,
+  X,
 } from "lucide-react";
 import Link from "next/link";
+import { useLoadScript, Autocomplete } from "@react-google-maps/api";
+
+const libraries: "places"[] = ["places"];
 
 export const vehicleOptions = [
   "Personbil / Private Car (B)",
@@ -30,23 +35,18 @@ export const vehicleOptions = [
   "Traktor / Maskin / Tractor",
 ];
 
-export const areaOptions = [
-  "Stockholm",
-  "Göteborg (Västra Götaland)",
-  "Malmö (Skåne)",
-  "Uppsala",
-  "Östergötland (Linköping/Norrköping)",
-  "Jönköping",
-  "Halland",
-  "Västmanland (Västerås)",
-  "Gävleborg",
-  "Norrland (North Sweden)",
-  "Hela Sverige / All Sweden",
-];
-
 export default function RegisterPage() {
   const [role, setRole] = useState<"driver" | "employer">("driver");
   const [step, setStep] = useState(1);
+
+  // Google Maps Loader
+  const { isLoaded } = useLoadScript({
+    googleMapsApiKey: process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || "",
+    libraries,
+  });
+
+  const [autocomplete, setAutocomplete] =
+    useState<google.maps.places.Autocomplete | null>(null);
 
   const [formData, setFormData] = useState({
     fullName: "",
@@ -76,6 +76,32 @@ export default function RegisterPage() {
           : [...prev[listKey], value],
       };
     });
+  };
+
+  // Google Places Autocomplete Select Handler
+  const onPlaceChanged = () => {
+    if (autocomplete !== null) {
+      const place = autocomplete.getPlace();
+      if (place.formatted_address || place.name) {
+        const selectedLocation = place.formatted_address || place.name || "";
+        if (
+          selectedLocation &&
+          !formData.preferredAreas.includes(selectedLocation)
+        ) {
+          setFormData((prev) => ({
+            ...prev,
+            preferredAreas: [...prev.preferredAreas, selectedLocation],
+          }));
+        }
+      }
+    }
+  };
+
+  const handleRemoveArea = (area: string) => {
+    setFormData((prev) => ({
+      ...prev,
+      preferredAreas: prev.preferredAreas.filter((item) => item !== area),
+    }));
   };
 
   const handleRegister = (e: React.FormEvent) => {
@@ -141,13 +167,19 @@ export default function RegisterPage() {
           {role === "driver" && (
             <div className="mt-6 flex items-center justify-center gap-2">
               <span
-                className={`h-1.5 w-12 rounded-full ${step >= 1 ? "bg-[#2563EB]" : "bg-slate-200"}`}
+                className={`h-1.5 w-12 rounded-full ${
+                  step >= 1 ? "bg-[#2563EB]" : "bg-slate-200"
+                }`}
               />
               <span
-                className={`h-1.5 w-12 rounded-full ${step >= 2 ? "bg-[#2563EB]" : "bg-slate-200"}`}
+                className={`h-1.5 w-12 rounded-full ${
+                  step >= 2 ? "bg-[#2563EB]" : "bg-slate-200"
+                }`}
               />
               <span
-                className={`h-1.5 w-12 rounded-full ${step >= 3 ? "bg-[#2563EB]" : "bg-slate-200"}`}
+                className={`h-1.5 w-12 rounded-full ${
+                  step >= 3 ? "bg-[#2563EB]" : "bg-slate-200"
+                }`}
               />
             </div>
           )}
@@ -372,30 +404,55 @@ export default function RegisterPage() {
                     </div>
                   </div>
 
+                  {/* MAP LOCATION TYPE INPUT */}
                   <div>
                     <label className="mb-2 block text-xs font-bold text-slate-900">
                       Preferred Locations:
                     </label>
-                    <div className="flex flex-wrap gap-2">
-                      {areaOptions.map((area) => {
-                        const selected = formData.preferredAreas.includes(area);
-                        return (
+
+                    {isLoaded ? (
+                      <Autocomplete
+                        onLoad={(auto) => setAutocomplete(auto)}
+                        onPlaceChanged={onPlaceChanged}
+                      >
+                        <div className="relative">
+                          <input
+                            type="text"
+                            placeholder="Type a city or location from map..."
+                            className="w-full rounded-xl border border-slate-200 bg-white py-2.5 pl-9 pr-3.5 text-xs font-medium text-slate-900 focus:border-[#2563EB] focus:outline-none focus:ring-1 focus:ring-[#2563EB]"
+                          />
+                          <MapPin className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+                        </div>
+                      </Autocomplete>
+                    ) : (
+                      <div className="relative">
+                        <input
+                          type="text"
+                          disabled
+                          placeholder="Loading map locations..."
+                          className="w-full rounded-xl border border-slate-200 bg-slate-100 py-2.5 pl-9 pr-3.5 text-xs font-medium text-slate-400"
+                        />
+                        <MapPin className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+                      </div>
+                    )}
+
+                    {/* Selected Map Locations */}
+                    <div className="mt-2.5 flex flex-wrap gap-2">
+                      {formData.preferredAreas.map((area) => (
+                        <span
+                          key={area}
+                          className="flex items-center gap-1.5 rounded-lg bg-[#2563EB] px-3 py-1.5 text-xs font-bold text-white shadow-sm"
+                        >
+                          {area}
                           <button
-                            key={area}
                             type="button"
-                            onClick={() =>
-                              toggleArrayItem("preferredAreas", area)
-                            }
-                            className={`rounded-lg px-3 py-1.5 text-xs font-bold transition-all ${
-                              selected
-                                ? "bg-[#2563EB] text-white"
-                                : "bg-slate-100 text-slate-600 hover:bg-slate-200"
-                            }`}
+                            onClick={() => handleRemoveArea(area)}
+                            className="hover:text-red-200"
                           >
-                            {area}
+                            <X className="h-3.5 w-3.5" />
                           </button>
-                        );
-                      })}
+                        </span>
+                      ))}
                     </div>
                   </div>
 

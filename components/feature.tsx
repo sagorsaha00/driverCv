@@ -2,8 +2,10 @@
 
 import { motion } from "framer-motion";
 import { ArrowRight, CheckCircle2 } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 export default function DarkFeatureSection() {
+  const router = useRouter();
   return (
     <section className="bg-[#0F172A] py-16 text-white sm:py-24">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
@@ -85,7 +87,10 @@ export default function DarkFeatureSection() {
               </div>
             </div>
 
-            <button className="mt-6 w-full rounded-xl bg-[#2563EB] py-3 text-xs font-bold text-white shadow-md transition-all hover:bg-blue-600">
+            <button
+              onClick={() => router.push("/ExploreDrivers")}
+              className="mt-6 w-full cursor-pointer rounded-xl bg-[#2563EB] py-3 text-xs font-bold text-white shadow-md transition-all hover:bg-blue-600"
+            >
               Continue to Match Drivers →
             </button>
           </motion.div>

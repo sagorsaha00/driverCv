@@ -29,7 +29,7 @@ export default function CallToActionSection() {
             {/* Action Button */}
             <motion.div whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}>
               <Link
-                href="#post-job"
+                href="/PostDriverJob"
                 className="inline-flex shrink-0 items-center gap-2 rounded-full bg-[#2563EB] px-6 py-3.5 text-xs font-bold text-white shadow-lg shadow-blue-500/25 transition-all hover:bg-blue-700"
               >
                 <span>Post a Driving Job</span>

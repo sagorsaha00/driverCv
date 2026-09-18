@@ -80,10 +80,11 @@ const driversData = [
   },
 ];
 
+// Driver Explorer Page (Corporate Trust)
 export default function DriverExplorer() {
   const [selectedRole, setSelectedRole] = useState("Personal Chauffeur");
   const [selectedLocation, setSelectedLocation] = useState("Dhaka");
-  const [isFilterOpen, setIsFilterOpen] = useState(false); // Mobile Toggle State
+  const [isFilterOpen, setIsFilterOpen] = useState(false);
 
   const resetFilters = () => {
     setSelectedRole("");
@@ -91,12 +92,11 @@ export default function DriverExplorer() {
   };
 
   return (
-    <div className="min-h-screen bg-[#F8FAFC] px-4 py-8 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-slate-50 px-4 py-8 sm:px-6 lg:px-8">
       <div className="mx-auto max-w-7xl">
-        {/* Top Header Bar */}
         <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <h1 className="text-xl font-extrabold text-[#36454F]">
+            <h1 className="text-xl font-extrabold text-slate-900">
               Find & Hire Drivers
             </h1>
             <p className="text-xs text-slate-500">
@@ -105,12 +105,11 @@ export default function DriverExplorer() {
           </div>
 
           <div className="flex items-center gap-3">
-            {/* Mobile Filter Toggle Button */}
             <button
               onClick={() => setIsFilterOpen(true)}
-              className="flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-3.5 py-2 text-xs font-bold text-[#36454F] shadow-sm hover:border-[#6082B6] lg:hidden"
+              className="flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-3.5 py-2 text-xs font-bold text-slate-800 shadow-sm hover:border-[#2563EB] lg:hidden"
             >
-              <SlidersHorizontal className="h-4 w-4 text-[#6082B6]" />
+              <SlidersHorizontal className="h-4 w-4 text-[#2563EB]" />
               <span>Filters</span>
             </button>
 
@@ -118,7 +117,7 @@ export default function DriverExplorer() {
               Sort by:
             </span>
             <div className="relative">
-              <select className="appearance-none rounded-xl border border-slate-200 bg-white py-2 pl-3.5 pr-8 text-xs font-bold text-[#36454F] shadow-sm focus:border-[#6082B6] focus:outline-none">
+              <select className="appearance-none rounded-xl border border-slate-200 bg-white py-2 pl-3.5 pr-8 text-xs font-bold text-slate-800 shadow-sm focus:border-[#2563EB] focus:outline-none">
                 <option>Highest Rated</option>
                 <option>Most Experienced</option>
                 <option>Salary: Low to High</option>
@@ -128,10 +127,9 @@ export default function DriverExplorer() {
           </div>
         </div>
 
-        {/* Main Layout Grid */}
         <div className="grid grid-cols-1 gap-6 lg:grid-cols-12">
           <aside className="hidden lg:col-span-3 lg:block">
-            <div className="sticky top-6 rounded-2xl border border-slate-200/80 bg-white p-5 shadow-sm">
+            <div className="sticky top-6 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
               <FilterContent
                 selectedRole={selectedRole}
                 setSelectedRole={setSelectedRole}
@@ -145,7 +143,6 @@ export default function DriverExplorer() {
           <AnimatePresence>
             {isFilterOpen && (
               <>
-                {/* Backdrop */}
                 <motion.div
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
@@ -154,7 +151,6 @@ export default function DriverExplorer() {
                   className="fixed inset-0 z-40 bg-slate-900/40 backdrop-blur-sm lg:hidden"
                 />
 
-                {/* Sliding Modal Drawer */}
                 <motion.div
                   initial={{ x: "-100%" }}
                   animate={{ x: 0 }}
@@ -163,7 +159,7 @@ export default function DriverExplorer() {
                   className="fixed inset-y-0 left-0 z-50 w-full max-w-xs overflow-y-auto bg-white p-6 shadow-2xl lg:hidden"
                 >
                   <div className="mb-4 flex items-center justify-between border-b border-slate-100 pb-3">
-                    <h2 className="text-sm font-extrabold text-[#36454F]">
+                    <h2 className="text-sm font-extrabold text-slate-900">
                       Filter Drivers
                     </h2>
                     <button
@@ -184,7 +180,7 @@ export default function DriverExplorer() {
 
                   <button
                     onClick={() => setIsFilterOpen(false)}
-                    className="mt-6 w-full rounded-xl bg-[#6082B6] py-3 text-xs font-bold text-white shadow-sm"
+                    className="mt-6 w-full rounded-xl bg-[#2563EB] py-3 text-xs font-bold text-white shadow-sm hover:bg-blue-700"
                   >
                     Apply Filters
                   </button>
@@ -193,7 +189,6 @@ export default function DriverExplorer() {
             )}
           </AnimatePresence>
 
-          {/* ================= DRIVER CARDS SECTION ================= */}
           <main className="lg:col-span-9">
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
               {driversData.map((driver) => (
@@ -207,9 +202,6 @@ export default function DriverExplorer() {
   );
 }
 
-{
-  /* Reusable Filter Controls */
-}
 function FilterContent({
   selectedRole,
   setSelectedRole,
@@ -221,8 +213,8 @@ function FilterContent({
     <div>
       <div className="flex items-center justify-between pb-3.5">
         <div className="flex items-center gap-2">
-          <SlidersHorizontal className="h-4 w-4 text-[#6082B6]" />
-          <h2 className="text-xs font-extrabold uppercase tracking-wider text-[#36454F]">
+          <SlidersHorizontal className="h-4 w-4 text-[#2563EB]" />
+          <h2 className="text-xs font-extrabold uppercase tracking-wider text-slate-900">
             Filters
           </h2>
         </div>
@@ -235,9 +227,8 @@ function FilterContent({
         </button>
       </div>
 
-      {/* Driver Types */}
       <div className="mt-4">
-        <h3 className="mb-2.5 text-xs font-bold text-[#36454F]">
+        <h3 className="mb-2.5 text-xs font-bold text-slate-900">
           Vehicle & Driver Type
         </h3>
         <div className="space-y-1">
@@ -247,7 +238,7 @@ function FilterContent({
               onClick={() => setSelectedRole(type)}
               className={`flex w-full items-center justify-between rounded-xl px-3 py-2 text-left text-xs font-medium transition-colors ${
                 selectedRole === type
-                  ? "bg-[#6082B6]/10 font-bold text-[#6082B6]"
+                  ? "bg-blue-50 font-bold text-[#2563EB]"
                   : "text-slate-600 hover:bg-slate-50"
               }`}
             >
@@ -258,20 +249,19 @@ function FilterContent({
         </div>
       </div>
 
-      {/* Location */}
       <div className="mt-6 border-t border-slate-100 pt-5">
-        <h3 className="mb-2.5 text-xs font-bold text-[#36454F]">Location</h3>
+        <h3 className="mb-2.5 text-xs font-bold text-slate-900">Location</h3>
         <div className="space-y-2">
           {locations.map((loc) => (
             <label
               key={loc}
-              className="flex cursor-pointer items-center gap-2.5 text-xs font-medium text-slate-600 hover:text-[#36454F]"
+              className="flex cursor-pointer items-center gap-2.5 text-xs font-medium text-slate-600 hover:text-slate-900"
             >
               <input
                 type="checkbox"
                 checked={selectedLocation === loc}
                 onChange={() => setSelectedLocation(loc)}
-                className="h-4 w-4 rounded border-slate-300 text-[#6082B6] focus:ring-[#6082B6]"
+                className="h-4 w-4 rounded border-slate-300 text-[#2563EB] focus:ring-[#2563EB]"
               />
               <span>{loc}</span>
             </label>
@@ -282,28 +272,18 @@ function FilterContent({
   );
 }
 
-{
-  /* Driver Card */
-}
 function DriverCard({ driver }: { driver: any }) {
   return (
-    <div
-      className="
-      group relative flex flex-col justify-between
-      rounded-bl-2xl rounded-tr-3xl rounded-tl-xl rounded-br-xl
-      border border-slate-200/80 bg-white p-4
-      shadow-sm transition-all duration-200 hover:border-[#6082B6]/50 hover:shadow-md
-    "
-    >
+    <div className="group relative flex flex-col justify-between rounded-bl-2xl rounded-br-xl rounded-tl-xl rounded-tr-3xl border border-slate-200 bg-white p-4 shadow-sm transition-all duration-200 hover:border-[#2563EB]/50 hover:shadow-md">
       <div>
         <div className="flex items-start justify-between">
           <div className="flex items-center gap-3">
-            <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-[#6082B6]/10 text-xs font-black text-[#6082B6]">
+            <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-blue-50 text-xs font-black text-[#2563EB]">
               {driver.initials}
             </div>
             <div className="min-w-0">
               <div className="flex items-center gap-1">
-                <h3 className="truncate text-xs font-bold text-[#36454F] group-hover:text-[#6082B6]">
+                <h3 className="truncate text-xs font-bold text-slate-900 group-hover:text-[#2563EB]">
                   {driver.name}
                 </h3>
                 {driver.verified && (
@@ -325,7 +305,7 @@ function DriverCard({ driver }: { driver: any }) {
 
         <div className="mt-4 grid grid-cols-2 gap-2 border-t border-slate-100 pt-3 text-[10px]">
           <div className="flex items-center gap-1.5 text-slate-500">
-            <MapPin className="h-3.5 w-3.5 text-[#6082B6]" />
+            <MapPin className="h-3.5 w-3.5 text-[#2563EB]" />
             <span className="truncate">{driver.location}</span>
           </div>
           <div className="flex items-center gap-1.5 text-slate-500">
@@ -340,11 +320,15 @@ function DriverCard({ driver }: { driver: any }) {
           <MessageSquare className="h-3 w-3 text-slate-400" />
           <span>Message</span>
         </button>
-        <button className="flex items-center justify-center gap-1 rounded-bl-xl rounded-tr-2xl rounded-tl-md rounded-br-md bg-[#6082B6] py-2 text-[10px] font-bold text-white shadow-sm hover:bg-[#4F71A5]">
+        <button className="flex items-center justify-center gap-1 rounded-bl-xl rounded-br-md rounded-tl-md rounded-tr-2xl bg-[#2563EB] py-2 text-[10px] font-bold text-white shadow-sm hover:bg-blue-700">
           <UserCheck className="h-3 w-3" />
           <span>Hire Now</span>
         </button>
       </div>
     </div>
   );
+}
+
+{
+  /* Reusable Filter Controls */
 }

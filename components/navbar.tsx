@@ -24,22 +24,17 @@ export default function Navbar() {
         {/* Desktop Navigation */}
         <nav className="hidden items-center gap-8 text-xs font-semibold text-slate-600 md:flex">
           <Link
-            href="#drivers"
+            href="/ExploreDrivers"
             className="transition-colors hover:text-[#2563EB]"
           >
             Find Drivers
           </Link>
-          <Link href="#jobs" className="transition-colors hover:text-[#2563EB]">
+          <Link href="/EmployerJobFeed" className="transition-colors hover:text-[#2563EB]">
             Find Driving Jobs
           </Link>
+        
           <Link
-            href="#how-it-works"
-            className="transition-colors hover:text-[#2563EB]"
-          >
-            How It Works
-          </Link>
-          <Link
-            href="#login"
+            href="/login"
             className="transition-colors hover:text-[#2563EB]"
           >
             Log In

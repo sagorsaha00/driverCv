@@ -2,8 +2,10 @@
 
 import { motion } from "framer-motion";
 import { Search, MapPin, ArrowRight, ShieldCheck } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 export default function HeroSection() {
+  const router = useRouter();
   return (
     <section className="relative overflow-hidden bg-gradient-to-b from-blue-50/60 via-white to-white py-12 lg:py-20">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
@@ -30,10 +32,20 @@ export default function HeroSection() {
           </p>
 
           <div className="mt-6 flex flex-col justify-center gap-3 sm:flex-row">
-            <button className="rounded-full bg-[#2563EB] px-6 py-3 text-xs font-bold text-white shadow-lg shadow-blue-500/25 transition-all hover:bg-blue-700">
+            <button
+              onClick={() => {
+                router.push("/ExploreDrivers");
+              }}
+              className="rounded-full cursor-pointer bg-[#2563EB] px-6 py-3 text-xs font-bold text-white shadow-lg shadow-blue-500/25 transition-all hover:bg-blue-700"
+            >
               I Need a Driver →
             </button>
-            <button className="rounded-full border border-slate-200 bg-white px-6 py-3 text-xs font-bold text-slate-700 transition-all hover:bg-slate-50">
+            <button
+              onClick={() => {
+                router.push("/EmployerJobFeed");
+              }}
+              className="rounded-full cursor-pointer border border-slate-200 bg-white px-6 py-3 text-xs font-bold text-slate-700 transition-all hover:bg-slate-50"
+            >
               I Am a Driver
             </button>
           </div>
