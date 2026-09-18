@@ -8,6 +8,7 @@ import {
   Briefcase,
 } from "lucide-react";
 import { motion } from "framer-motion";
+import { useRouter } from "next/navigation";
 
 interface Driver {
   id: number;
@@ -28,6 +29,10 @@ export default function DriverCard({
   driver: Driver;
   index: number;
 }) {
+  const router = useRouter();
+  const handleViewProfile = () => {
+    router.push(`/driverProfile/3434`)
+  };
   return (
     <motion.article
       initial={{ opacity: 0, y: 12 }}
@@ -116,6 +121,7 @@ export default function DriverCard({
 
       {/* View Profile Action Button */}
       <button
+        onClick={handleViewProfile}
         className="
           mt-4 flex w-full  cursor-pointer items-center justify-center gap-1.5
           rounded-xl border border-slate-200 bg-slate-50 py-2.5
