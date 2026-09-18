@@ -1,112 +1,155 @@
 "use client";
 
+import { useState } from "react";
 import { motion } from "framer-motion";
-import { Star, MapPin, CheckCircle2 } from "lucide-react";
-import { useRouter } from "next/navigation";  
+import { useRouter } from "next/navigation";
+import { ArrowRight, ShieldCheck } from "lucide-react";
+import DriverCard from "./DriverCard";
 
-const drivers = [
+const initialDrivers = [
   {
     id: 1,
     name: "Arman Hassan",
+    initials: "AH",
     role: "Taxi & Rideshare Driver",
-    loc: "Stockholm",
-    rate: "4.9",
-    status: "Available Now",
-    init: "AH",
+    location: "Stockholm",
+    experience: "5 yrs",
+    rating: "4.9",
+    available: "Available Now",
+    verified: true,
   },
   {
     id: 2,
     name: "Emma Lindqvist",
+    initials: "EL",
     role: "Heavy Truck Driver (CE)",
-    loc: "Gothenburg",
-    rate: "5.0",
-    status: "Available in 2 days",
-    init: "EL",
+    location: "Gothenburg",
+    experience: "8 yrs",
+    rating: "5.0",
+    available: "Available in 2 days",
+    verified: true,
   },
   {
     id: 3,
     name: "Johan Berg",
-    role: "Coach & Bus Driver",
-    loc: "Malmö",
-    rate: "4.8",
-    status: "Weekends Only",
-    init: "JB",
+    initials: "JB",
+    role: "Coach & Bus Driver (D)",
+    location: "Malmö",
+    experience: "10 yrs",
+    rating: "4.8",
+    available: "Weekends & Shift",
+    verified: true,
+  },
+  {
+    id: 4,
+    name: "Sofia Karlsson",
+    initials: "SK",
+    role: "Delivery Van Driver (B)",
+    location: "Uppsala",
+    experience: "4 yrs",
+    rating: "4.9",
+    available: "Available Now",
+    verified: true,
+  },
+  {
+    id: 5,
+    name: "Mikael Lind",
+    initials: "ML",
+    role: "Long-Haul Freight (CE)",
+    location: "Jönköping",
+    experience: "12 yrs",
+    rating: "4.9",
+    available: "Full-time Only",
+    verified: true,
+  },
+  {
+    id: 6,
+    name: "Elin Andersson",
+    initials: "EA",
+    role: "Executive Chauffeur",
+    location: "Stockholm",
+    experience: "6 yrs",
+    rating: "5.0",
+    available: "Flexible Hours",
+    verified: true,
   },
 ];
 
 export default function DriverGridSection() {
   const router = useRouter();
+  const [filter, setFilter] = useState("All");
 
-  // Dynamic routing function using driver ID
-  const handleViewProfile = (id?: number) => {
-    if (id) {
-      router.push(`/driverProfile/${id}`);
-    } else {
-      router.push("/ExploreDrivers");  
-    }
-  };
+  const categories = [
+    "All",
+    "Heavy Truck (CE)",
+    "Delivery Van (B)",
+    "Bus (D)",
+    "Taxi",
+  ];
+
+  const filteredDrivers = initialDrivers.filter((driver) => {
+    if (filter === "All") return true;
+    if (filter.includes("Heavy") && driver.role.includes("CE")) return true;
+    if (filter.includes("Delivery") && driver.role.includes("Delivery"))
+      return true;
+    if (filter.includes("Bus") && driver.role.includes("Bus")) return true;
+    if (
+      filter.includes("Taxi") &&
+      (driver.role.includes("Taxi") || driver.role.includes("Chauffeur"))
+    )
+      return true;
+    return true;
+  });
 
   return (
-    <section className="bg-slate-50/80 py-16 sm:py-20">
+    <section className="bg-zinc-50/70 py-16 sm:py-20 border-b border-zinc-200/60">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <div className="mb-8 flex flex-col justify-between gap-2 sm:flex-row sm:items-end">
+        {/* Section Header */}
+        <div className="mb-8 flex flex-col justify-between gap-4 md:flex-row md:items-end">
           <div>
-            <span className="text-[10px] font-bold uppercase tracking-wider text-[#2563EB]">
-              VERIFIED PROFESSIONALS
-            </span>
-            <h2 className="text-xl font-extrabold text-slate-900 sm:text-3xl">
-              Drivers in Your Area
+            <div className="inline-flex items-center gap-1.5 rounded-full bg-zinc-100 border border-zinc-200 px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-zinc-900">
+              <ShieldCheck className="h-3.5 w-3.5 text-black" />
+              <span>Verified Professionals</span>
+            </div>
+            <h2 className="mt-2 font-display text-2xl font-black tracking-tight text-black sm:text-3xl">
+              Featured Drivers Available Now
             </h2>
+            <p className="mt-1 text-xs text-zinc-500 sm:text-sm">
+              Pre-screened licenses, background checks, and clean driving
+              records.
+            </p>
           </div>
+
           <button
-            onClick={() => handleViewProfile()}
-            className="cursor-pointer text-left text-xs font-bold text-[#2563EB] hover:underline sm:text-right"
+            onClick={() => router.push("/ExploreDrivers")}
+            className="inline-flex items-center gap-1.5 text-xs font-bold text-black hover:text-zinc-600 transition-colors cursor-pointer"
           >
-            Explore All Drivers →
+            <span>Browse All 4,500+ Drivers</span>
+            <ArrowRight className="h-3.5 w-3.5" />
           </button>
         </div>
 
-        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {drivers.map((d) => (
-            <motion.div
-              key={d.id}
-              whileHover={{ y: -6 }}
-              className="rounded-2xl border border-slate-200/80 bg-white p-5 shadow-sm transition-all hover:shadow-md"
+        {/* Category Filter Chips */}
+        <div className="mb-8 flex flex-wrap gap-2">
+          {categories.map((cat) => (
+            <button
+              key={cat}
+              onClick={() => setFilter(cat)}
+              className={`rounded-xl px-3.5 py-1.5 text-xs font-semibold transition-all cursor-pointer ${
+                filter === cat
+                  ? "bg-black text-white shadow-xs"
+                  : "bg-white text-zinc-700 border border-zinc-200 hover:border-zinc-300 hover:bg-zinc-50"
+              }`}
             >
-              <div className="flex items-center gap-3">
-                <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-blue-50 text-sm font-black text-[#2563EB]">
-                  {d.init}
-                </div>
-                <div>
-                  <h3 className="text-xs font-bold text-slate-900">{d.name}</h3>
-                  <p className="text-[11px] text-slate-500">{d.role}</p>
-                </div>
-              </div>
+              {cat}
+            </button>
+          ))}
+        </div>
 
-              <div className="mt-4 flex items-center justify-between border-t border-slate-100 pt-3 text-[11px] text-slate-500">
-                <span className="flex items-center gap-1">
-                  <MapPin className="h-3.5 w-3.5 text-slate-400" />
-                  {d.loc}
-                </span>
-                <span className="flex items-center gap-1">
-                  <Star className="h-3.5 w-3.5 fill-amber-400 text-amber-400" />
-                  <b>{d.rate}</b>
-                </span>
-              </div>
-
-              <div className="mt-3 flex items-center gap-1.5 rounded-xl bg-emerald-50 px-3 py-1.5 text-[10px] font-semibold text-emerald-700">
-                <CheckCircle2 className="h-3.5 w-3.5 text-emerald-600" />
-                {d.status}
-              </div>
-
-              {/* Dynamic ID onClick Listener added below */}
-              <button
-                onClick={() => handleViewProfile(d.id)}
-                className="mt-4 w-full cursor-pointer rounded-xl border border-slate-200 py-2.5 text-xs font-bold text-slate-700 transition-colors hover:bg-slate-50 hover:text-[#2563EB]"
-              >
-                View Profile →
-              </button>
-            </motion.div>
+        {/* Drivers 3-column Grid */}
+        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          {filteredDrivers.map((driver, index) => (
+            <DriverCard key={driver.id} driver={driver} index={index} />
           ))}
         </div>
       </div>
