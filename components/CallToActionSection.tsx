@@ -6,7 +6,7 @@ import Link from "next/link";
 
 export default function CallToActionSection() {
   return (
-    <section className="bg-zinc-50 py-16 sm:py-20 border-b border-zinc-200/80">
+    <section className="bg-() py-16 sm:py-20 border-b border-zinc-200/80">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <motion.div
           initial={{ opacity: 0, scale: 0.98 }}
