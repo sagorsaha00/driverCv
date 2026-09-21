@@ -202,9 +202,7 @@ export default function DriverProfileView({
   return (
     <div className="min-h-screen bg-[#F7F7F7] px-4 py-8 sm:px-6 lg:px-8">
       <div className="mx-auto max-w-6xl">
-        {/* =====================================================
-            BACK BUTTON
-        ====================================================== */}
+        
 
         <motion.button
           initial={{ opacity: 0, x: -10 }}
@@ -606,49 +604,6 @@ export default function DriverProfileView({
             {/* =================================================
                 LICENSES
             ================================================== */}
-
-            <motion.section
-              initial={{ opacity: 0, x: 15 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: 0.2 }}
-              className="rounded-2xl border border-[#E5E5E5] bg-white p-5 shadow-sm"
-            >
-              <div className="mb-4 flex items-center gap-2">
-                <Award className="h-4 w-4 text-[#111111]" />
-
-                <h2 className="text-xs font-bold uppercase tracking-wider text-[#111111]">
-                  License Endorsements
-                </h2>
-              </div>
-
-              <div className="space-y-2">
-                {data.licenses.map((license, index) => {
-                  const verified =
-                    license.status.toLowerCase().includes("verified") ||
-                    license.status.toLowerCase().includes("active") ||
-                    license.status.toLowerCase().includes("valid");
-
-                  return (
-                    <div
-                      key={`${license.name}-${index}`}
-                      className="flex items-center justify-between gap-3 rounded-xl border border-[#EAEAEA] bg-[#F7F7F7] px-3 py-2.5"
-                    >
-                      <span className="text-xs font-semibold text-[#404040]">
-                        {license.name}
-                      </span>
-
-                      <span
-                        className={`shrink-0 text-[9px] font-bold ${
-                          verified ? "text-[#111111]" : "text-[#737373]"
-                        }`}
-                      >
-                        {license.status}
-                      </span>
-                    </div>
-                  );
-                })}
-              </div>
-            </motion.section>
 
             {/* =================================================
                 DIRECT CONTACT

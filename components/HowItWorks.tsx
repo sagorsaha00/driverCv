@@ -69,7 +69,7 @@ export default function HowItWorksSection() {
   const steps = activeTab === "employers" ? employerSteps : driverSteps;
 
   return (
-    <section className="bg-white py-16 sm:py-24 border-b border-zinc-200/80">
+    <section className="bg-[var(--bg)] py-16 sm:py-24 border-b border-[var(--border)]">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         {/* Section Heading */}
         <motion.div
@@ -78,25 +78,25 @@ export default function HowItWorksSection() {
           viewport={{ once: true }}
           className="text-center max-w-2xl mx-auto"
         >
-          <span className="text-[11px] font-bold uppercase tracking-widest text-zinc-500">
+          <span className="text-[11px] font-bold uppercase tracking-widest text-[var(--primary)]">
             SIMPLE, TRANSPARENT WORKFLOW
           </span>
-          <h2 className="mt-2 font-display text-2xl font-black text-black sm:text-4xl">
+          <h2 className="mt-2 font-display text-2xl font-black text-[var(--text)] sm:text-4xl">
             How DriverCVs Works
           </h2>
-          <p className="mt-3 text-xs text-zinc-500 sm:text-sm">
+          <p className="mt-3 text-xs text-[var(--text-muted)] sm:text-sm">
             Whether you are expanding your commercial fleet or seeking your next
             driving role, we make the process friction-free.
           </p>
 
           {/* Toggle Switch */}
-          <div className="mt-6 inline-flex rounded-xl bg-zinc-100 p-1 border border-zinc-200">
+          <div className="mt-6 inline-flex rounded-xl bg-[var(--surface-muted)] p-1 border border-[var(--border)]">
             <button
               onClick={() => setActiveTab("employers")}
               className={`flex items-center gap-2 rounded-lg px-4 py-2 text-xs font-bold transition-all cursor-pointer ${
                 activeTab === "employers"
-                  ? "bg-black text-white shadow-xs"
-                  : "text-zinc-600 hover:text-black"
+                  ? "bg-[var(--primary)] text-[var(--on-primary)] shadow-xs"
+                  : "text-[var(--text-muted)] hover:text-[var(--text)]"
               }`}
             >
               <Building2 className="h-4 w-4" />
@@ -106,8 +106,8 @@ export default function HowItWorksSection() {
               onClick={() => setActiveTab("drivers")}
               className={`flex items-center gap-2 rounded-lg px-4 py-2 text-xs font-bold transition-all cursor-pointer ${
                 activeTab === "drivers"
-                  ? "bg-black text-white shadow-xs"
-                  : "text-zinc-600 hover:text-black"
+                  ? "bg-[var(--primary)] text-[var(--on-primary)] shadow-xs"
+                  : "text-[var(--text-muted)] hover:text-[var(--text)]"
               }`}
             >
               <Car className="h-4 w-4" />
@@ -132,23 +132,23 @@ export default function HowItWorksSection() {
                 <motion.div
                   key={step.number}
                   whileHover={{ y: -5 }}
-                  className="relative overflow-hidden rounded-2xl border border-zinc-200 bg-zinc-50/50 p-6 sm:p-7 shadow-xs transition-all hover:bg-white hover:border-black hover:shadow-lg"
+                  className="relative overflow-hidden rounded-2xl border border-[var(--border)] bg-[var(--surface-subtle)] p-6 sm:p-7 shadow-xs transition-all hover:bg-[var(--surface)] hover:border-[var(--primary)] hover:shadow-md"
                 >
                   {/* Step Number in Top Right */}
-                  <span className="absolute right-5 top-5 font-display text-3xl font-black text-zinc-200 select-none">
+                  <span className="absolute right-5 top-5 font-display text-3xl font-black text-[var(--border-strong)] select-none opacity-60">
                     {step.number}
                   </span>
 
                   {/* Icon Badge */}
-                  <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-black text-white shadow-md shadow-black/10">
+                  <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-[var(--primary)] text-[var(--on-primary)] shadow-md shadow-[var(--shadow-xs)]">
                     <IconComponent className="h-6 w-6" />
                   </div>
 
                   {/* Text Content */}
-                  <h3 className="mt-5 font-display text-base font-bold text-black">
+                  <h3 className="mt-5 font-display text-base font-bold text-[var(--text)]">
                     {step.title}
                   </h3>
-                  <p className="mt-2 text-xs font-normal leading-relaxed text-zinc-600">
+                  <p className="mt-2 text-xs font-normal leading-relaxed text-[var(--text-muted)]">
                     {step.description}
                   </p>
                 </motion.div>
@@ -163,7 +163,7 @@ export default function HowItWorksSection() {
             href={
               activeTab === "employers" ? "/PostDriverJob" : "/EmployerJobFeed"
             }
-            className="inline-flex items-center gap-2 text-xs font-bold text-black hover:text-zinc-600 transition-colors"
+            className="inline-flex items-center gap-2 text-xs font-bold text-[var(--text)] hover:text-[var(--primary)] transition-colors"
           >
             <span>
               {activeTab === "employers"

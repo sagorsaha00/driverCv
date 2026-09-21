@@ -30,7 +30,7 @@ function useInViewOnce<T extends HTMLElement>() {
           io.disconnect();
         }
       },
-      { threshold: 0.25 },
+      { threshold: 0.25 }
     );
     io.observe(el);
     return () => io.disconnect();
@@ -147,7 +147,9 @@ export default function DarkFeatureSection() {
                 {typingLine1 && <Caret />}
                 <span className="opacity-0">{line1Rest}</span>
                 <br />
-                <span className="text-[var(--primary)]">{line2Typed}</span>
+                <span className="text-[var(--primary)]">
+                  {line2Typed}
+                </span>
                 {typingLine2 && <Caret />}
                 <span className="opacity-0">{line2Rest}</span>
               </span>
@@ -160,9 +162,7 @@ export default function DarkFeatureSection() {
             >
               <span aria-hidden>
                 <span>{PARAGRAPH.slice(0, paragraphCount)}</span>
-                <span className="opacity-0">
-                  {PARAGRAPH.slice(paragraphCount)}
-                </span>
+                <span className="opacity-0">{PARAGRAPH.slice(paragraphCount)}</span>
               </span>
             </p>
 
