@@ -49,11 +49,11 @@ export default function Navbar() {
       href: "/EmployerJobFeed",
       icon: Briefcase,
     },
-    {
-      name: "Dashboard",
-      href: "/dashboard",
-      icon: User,
-    },
+    // {
+    //   name: "Dashboard",
+    //   href: "/dashboard",
+    //   icon: User,
+    // },
   ];
 
   return (

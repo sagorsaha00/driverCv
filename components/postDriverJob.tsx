@@ -96,7 +96,7 @@ export default function PostDriverJob() {
 
   const updateField = <K extends keyof JobData>(
     field: K,
-    value: JobData[K]
+    value: JobData[K],
   ) => {
     setJobData((prev) => ({
       ...prev,
@@ -132,13 +132,11 @@ export default function PostDriverJob() {
     }
 
     console.log("Job Post Submitted:", jobData);
-
-    // Add your API call here
     setIsSubmitted(true);
   };
 
   return (
-    <main className="min-h-[calc(100vh-65px)] bg-slate-50 px-4 py-8 sm:px-6 lg:px-8">
+    <main className="min-h-[calc(100vh-65px)] bg-[var(--bg)] px-4 py-8 sm:px-6 lg:px-8 text-[var(--text)]">
       <div className="mx-auto w-full max-w-3xl">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -147,20 +145,20 @@ export default function PostDriverJob() {
         >
           {/* Header */}
           <div className="mb-6 text-center">
-            <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-blue-50 text-blue-600">
+            <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-[var(--surface-muted)] text-[var(--primary)]">
               <Briefcase className="h-7 w-7" />
             </div>
 
-            <h1 className="mt-4 text-2xl font-black tracking-tight text-slate-900 sm:text-3xl">
+            <h1 className="mt-4 text-2xl font-black tracking-tight text-[var(--text)] sm:text-3xl">
               Post a Driver Vacancy
             </h1>
 
-            <p className="mx-auto mt-2 max-w-xl text-sm leading-6 text-slate-500">
+            <p className="mx-auto mt-2 max-w-xl text-sm leading-6 text-[var(--text-muted)]">
               Find qualified and verified drivers across Sweden.
             </p>
           </div>
 
-          <div className="rounded-3xl border border-slate-200 bg-white p-5 shadow-xl shadow-slate-900/5 sm:p-8">
+          <div className="rounded-[var(--radius-xl)] border border-[var(--border)] bg-[var(--surface)] p-5 shadow-[var(--shadow-lg)] sm:p-8">
             {isSubmitted ? (
               /* SUCCESS */
               <motion.div
@@ -169,21 +167,21 @@ export default function PostDriverJob() {
                 transition={{ duration: 0.4 }}
                 className="py-8 text-center"
               >
-                <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-emerald-50 text-emerald-600">
+                <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-[var(--success-bg)] text-[var(--success)]">
                   <CheckCircle2 className="h-8 w-8" />
                 </div>
 
-                <h2 className="mt-5 text-2xl font-extrabold text-slate-900">
+                <h2 className="mt-5 text-2xl font-extrabold text-[var(--text)]">
                   Job Vacancy Published!
                 </h2>
 
-                <p className="mx-auto mt-3 max-w-lg text-sm leading-6 text-slate-500">
+                <p className="mx-auto mt-3 max-w-lg text-sm leading-6 text-[var(--text-muted)]">
                   Your post for{" "}
-                  <strong className="text-slate-800">
+                  <strong className="text-[var(--text)]">
                     {jobData.jobTitle}
                   </strong>{" "}
                   by{" "}
-                  <strong className="text-slate-800">
+                  <strong className="text-[var(--text)]">
                     {jobData.companyName}
                   </strong>{" "}
                   is now live. Verified drivers matching your requirements can
@@ -194,7 +192,7 @@ export default function PostDriverJob() {
                   <button
                     type="button"
                     onClick={() => router.push("/EmployerJobFeed")}
-                    className="flex items-center justify-center gap-2 rounded-xl bg-blue-600 px-6 py-3 text-sm font-bold text-white shadow-lg shadow-blue-600/20 transition hover:bg-blue-700"
+                    className="flex items-center justify-center gap-2 rounded-[var(--radius-md)] bg-[var(--primary)] px-6 py-3 text-sm font-bold text-[var(--on-primary)] shadow-[var(--shadow-sm)] transition hover:bg-[var(--primary-hover)] active:bg-[var(--primary-active)]"
                   >
                     View Job Feed
                     <ArrowRight className="h-4 w-4" />
@@ -209,21 +207,18 @@ export default function PostDriverJob() {
                         jobTitle: "",
                         companyName: "",
                         location: "Stockholm",
-                        vehicleRequired:
-                          "Tung Lastbil / Heavy Truck (C)",
+                        vehicleRequired: "Tung Lastbil / Heavy Truck (C)",
                         employmentType: "Heltid (Full-time)",
                         workingHours: "Dagtid (Day Shift)",
-                        salaryType:
-                          "Fast Månadslön (Fixed Monthly SEK)",
+                        salaryType: "Fast Månadslön (Fixed Monthly SEK)",
                         salaryAmount: "",
                         startDate: "",
                         jobDescription: "",
-                        requirements:
-                          "Giltigt YKB, Digitalt Förarkort",
+                        requirements: "Giltigt YKB, Digitalt Förarkort",
                         requiresTKT: false,
                       });
                     }}
-                    className="rounded-xl border border-slate-200 bg-white px-6 py-3 text-sm font-bold text-slate-700 transition hover:bg-slate-50"
+                    className="rounded-[var(--radius-md)] border border-[var(--border)] bg-[var(--surface)] px-6 py-3 text-sm font-bold text-[var(--text)] transition hover:bg-[var(--surface-muted)]"
                   >
                     Post Another Requirement
                   </button>
@@ -236,44 +231,46 @@ export default function PostDriverJob() {
                   <div className="flex items-center justify-center gap-3">
                     <div className="flex items-center gap-2">
                       <span
-                        className={`flex h-8 w-8 items-center justify-center rounded-full text-xs font-bold ${
+                        className={`flex h-8 w-8 items-center justify-center rounded-full text-xs font-bold transition-colors ${
                           step >= 1
-                            ? "bg-blue-600 text-white"
-                            : "bg-slate-100 text-slate-500"
+                            ? "bg-[var(--primary)] text-[var(--on-primary)]"
+                            : "bg-[var(--surface-muted)] text-[var(--text-subtle)]"
                         }`}
                       >
                         1
                       </span>
 
-                      <span className="hidden text-xs font-bold text-slate-700 sm:block">
+                      <span className="hidden text-xs font-bold text-[var(--text)] sm:block">
                         Role Basics
                       </span>
                     </div>
 
                     <div
-                      className={`h-0.5 w-10 sm:w-16 ${
-                        step >= 2 ? "bg-blue-600" : "bg-slate-200"
+                      className={`h-0.5 w-10 sm:w-16 transition-colors ${
+                        step >= 2
+                          ? "bg-[var(--primary)]"
+                          : "bg-[var(--border-subtle)]"
                       }`}
                     />
 
                     <div className="flex items-center gap-2">
                       <span
-                        className={`flex h-8 w-8 items-center justify-center rounded-full text-xs font-bold ${
+                        className={`flex h-8 w-8 items-center justify-center rounded-full text-xs font-bold transition-colors ${
                           step >= 2
-                            ? "bg-blue-600 text-white"
-                            : "bg-slate-100 text-slate-500"
+                            ? "bg-[var(--primary)] text-[var(--on-primary)]"
+                            : "bg-[var(--surface-muted)] text-[var(--text-subtle)]"
                         }`}
                       >
                         2
                       </span>
 
-                      <span className="hidden text-xs font-bold text-slate-700 sm:block">
+                      <span className="hidden text-xs font-bold text-[var(--text)] sm:block">
                         Compensation
                       </span>
                     </div>
                   </div>
 
-                  <div className="mt-3 text-center text-xs text-slate-400">
+                  <div className="mt-3 text-center text-xs text-[var(--text-subtle)]">
                     Step {step} of 2
                   </div>
                 </div>
@@ -291,22 +288,22 @@ export default function PostDriverJob() {
                         className="space-y-5"
                       >
                         <div>
-                          <h2 className="text-lg font-extrabold text-slate-900">
+                          <h2 className="text-lg font-extrabold text-[var(--text)]">
                             Role Overview
                           </h2>
-                          <p className="mt-1 text-xs text-slate-500">
+                          <p className="mt-1 text-xs text-[var(--text-muted)]">
                             Tell drivers what position you are hiring for.
                           </p>
                         </div>
 
                         {/* Job Title */}
                         <div>
-                          <label className="mb-2 block text-xs font-bold text-slate-800">
+                          <label className="mb-2 block text-xs font-bold text-[var(--text)]">
                             Job Title
                           </label>
 
                           <div className="relative">
-                            <Briefcase className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+                            <Briefcase className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[var(--text-subtle)]" />
 
                             <input
                               type="text"
@@ -316,19 +313,19 @@ export default function PostDriverJob() {
                                 updateField("jobTitle", e.target.value)
                               }
                               placeholder="e.g. C-Chaufför för Distribution"
-                              className="w-full rounded-xl border border-slate-200 bg-white py-3 pl-10 pr-4 text-sm font-medium text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-blue-600 focus:ring-4 focus:ring-blue-600/10"
+                              className="w-full rounded-[var(--radius-md)] border border-[var(--border)] bg-[var(--surface)] py-3 pl-10 pr-4 text-sm font-medium text-[var(--text)] outline-none transition placeholder:text-[var(--text-subtle)] focus:border-[var(--primary)] focus:ring-4 focus:ring-[var(--focus-ring)]"
                             />
                           </div>
                         </div>
 
                         {/* Company */}
                         <div>
-                          <label className="mb-2 block text-xs font-bold text-slate-800">
+                          <label className="mb-2 block text-xs font-bold text-[var(--text)]">
                             Company Name
                           </label>
 
                           <div className="relative">
-                            <Building2 className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+                            <Building2 className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[var(--text-subtle)]" />
 
                             <input
                               type="text"
@@ -338,7 +335,7 @@ export default function PostDriverJob() {
                                 updateField("companyName", e.target.value)
                               }
                               placeholder="e.g. Nordic Logistics AB"
-                              className="w-full rounded-xl border border-slate-200 bg-white py-3 pl-10 pr-4 text-sm font-medium text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-blue-600 focus:ring-4 focus:ring-blue-600/10"
+                              className="w-full rounded-[var(--radius-md)] border border-[var(--border)] bg-[var(--surface)] py-3 pl-10 pr-4 text-sm font-medium text-[var(--text)] outline-none transition placeholder:text-[var(--text-subtle)] focus:border-[var(--primary)] focus:ring-4 focus:ring-[var(--focus-ring)]"
                             />
                           </div>
                         </div>
@@ -346,19 +343,16 @@ export default function PostDriverJob() {
                         {/* License + Location */}
                         <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
                           <div>
-                            <label className="mb-2 block text-xs font-bold text-slate-800">
+                            <label className="mb-2 block text-xs font-bold text-[var(--text)]">
                               License Required
                             </label>
 
                             <select
                               value={jobData.vehicleRequired}
                               onChange={(e) =>
-                                updateField(
-                                  "vehicleRequired",
-                                  e.target.value
-                                )
+                                updateField("vehicleRequired", e.target.value)
                               }
-                              className="w-full rounded-xl border border-slate-200 bg-white px-3 py-3 text-sm font-medium text-slate-900 outline-none transition focus:border-blue-600 focus:ring-4 focus:ring-blue-600/10"
+                              className="w-full rounded-[var(--radius-md)] border border-[var(--border)] bg-[var(--surface)] px-3 py-3 text-sm font-medium text-[var(--text)] outline-none transition focus:border-[var(--primary)] focus:ring-4 focus:ring-[var(--focus-ring)]"
                             >
                               {vehicleCategories.map((vehicle) => (
                                 <option key={vehicle} value={vehicle}>
@@ -369,19 +363,19 @@ export default function PostDriverJob() {
                           </div>
 
                           <div>
-                            <label className="mb-2 block text-xs font-bold text-slate-800">
+                            <label className="mb-2 block text-xs font-bold text-[var(--text)]">
                               Work Location
                             </label>
 
                             <div className="relative">
-                              <MapPin className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+                              <MapPin className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[var(--text-subtle)]" />
 
                               <select
                                 value={jobData.location}
                                 onChange={(e) =>
                                   updateField("location", e.target.value)
                                 }
-                                className="w-full appearance-none rounded-xl border border-slate-200 bg-white py-3 pl-10 pr-3 text-sm font-medium text-slate-900 outline-none transition focus:border-blue-600 focus:ring-4 focus:ring-blue-600/10"
+                                className="w-full appearance-none rounded-[var(--radius-md)] border border-[var(--border)] bg-[var(--surface)] py-3 pl-10 pr-3 text-sm font-medium text-[var(--text)] outline-none transition focus:border-[var(--primary)] focus:ring-4 focus:ring-[var(--focus-ring)]"
                               >
                                 {swedenRegions.map((region) => (
                                   <option key={region} value={region}>
@@ -396,19 +390,16 @@ export default function PostDriverJob() {
                         {/* Employment + Shift */}
                         <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
                           <div>
-                            <label className="mb-2 block text-xs font-bold text-slate-800">
+                            <label className="mb-2 block text-xs font-bold text-[var(--text)]">
                               Employment Type
                             </label>
 
                             <select
                               value={jobData.employmentType}
                               onChange={(e) =>
-                                updateField(
-                                  "employmentType",
-                                  e.target.value
-                                )
+                                updateField("employmentType", e.target.value)
                               }
-                              className="w-full rounded-xl border border-slate-200 bg-white px-3 py-3 text-sm font-medium text-slate-900 outline-none transition focus:border-blue-600 focus:ring-4 focus:ring-blue-600/10"
+                              className="w-full rounded-[var(--radius-md)] border border-[var(--border)] bg-[var(--surface)] px-3 py-3 text-sm font-medium text-[var(--text)] outline-none transition focus:border-[var(--primary)] focus:ring-4 focus:ring-[var(--focus-ring)]"
                             >
                               {employmentTypes.map((type) => (
                                 <option key={type} value={type}>
@@ -419,19 +410,16 @@ export default function PostDriverJob() {
                           </div>
 
                           <div>
-                            <label className="mb-2 block text-xs font-bold text-slate-800">
+                            <label className="mb-2 block text-xs font-bold text-[var(--text)]">
                               Work Shift
                             </label>
 
                             <select
                               value={jobData.workingHours}
                               onChange={(e) =>
-                                updateField(
-                                  "workingHours",
-                                  e.target.value
-                                )
+                                updateField("workingHours", e.target.value)
                               }
-                              className="w-full rounded-xl border border-slate-200 bg-white px-3 py-3 text-sm font-medium text-slate-900 outline-none transition focus:border-blue-600 focus:ring-4 focus:ring-blue-600/10"
+                              className="w-full rounded-[var(--radius-md)] border border-[var(--border)] bg-[var(--surface)] px-3 py-3 text-sm font-medium text-[var(--text)] outline-none transition focus:border-[var(--primary)] focus:ring-4 focus:ring-[var(--focus-ring)]"
                             >
                               {workingHours.map((hours) => (
                                 <option key={hours} value={hours}>
@@ -442,37 +430,34 @@ export default function PostDriverJob() {
                           </div>
                         </div>
 
-                        {/* TKT */}
-                        <label className="flex cursor-pointer items-start gap-3 rounded-2xl border border-slate-200 bg-slate-50 p-4 transition hover:border-blue-200 hover:bg-blue-50/40">
+                        {/* TKT Option */}
+                        <label className="flex cursor-pointer items-start gap-3 rounded-[var(--radius-lg)] border border-[var(--border)] bg-[var(--surface-subtle)] p-4 transition hover:border-[var(--border-strong)] hover:bg-[var(--surface-muted)]">
                           <input
                             type="checkbox"
                             checked={jobData.requiresTKT}
                             onChange={(e) =>
-                              updateField(
-                                "requiresTKT",
-                                e.target.checked
-                              )
+                              updateField("requiresTKT", e.target.checked)
                             }
-                            className="mt-0.5 h-4 w-4 rounded border-slate-300 text-blue-600 focus:ring-blue-600"
+                            className="mt-0.5 h-4 w-4 rounded accent-[var(--primary)]"
                           />
 
                           <div>
-                            <p className="text-sm font-bold text-slate-800">
+                            <p className="text-sm font-bold text-[var(--text)]">
                               Taxi Badge Required
                             </p>
 
-                            <p className="mt-1 text-xs leading-5 text-slate-500">
+                            <p className="mt-1 text-xs leading-5 text-[var(--text-muted)]">
                               Requires Taxiförarlegitimation (TKT).
                             </p>
                           </div>
 
-                          <ShieldCheck className="ml-auto h-5 w-5 shrink-0 text-blue-500" />
+                          <ShieldCheck className="ml-auto h-5 w-5 shrink-0 text-[var(--primary-500)]" />
                         </label>
 
                         <button
                           type="button"
                           onClick={handleNextStep}
-                          className="flex w-full items-center justify-center gap-2 rounded-xl bg-blue-600 py-3.5 text-sm font-bold text-white shadow-lg shadow-blue-600/20 transition hover:bg-blue-700 active:scale-[0.99]"
+                          className="flex w-full items-center justify-center gap-2 rounded-[var(--radius-md)] bg-[var(--primary)] py-3.5 text-sm font-bold text-[var(--on-primary)] shadow-[var(--shadow-sm)] transition hover:bg-[var(--primary-hover)] active:bg-[var(--primary-active)] active:scale-[0.99]"
                         >
                           Continue to Compensation
                           <ArrowRight className="h-4 w-4" />
@@ -491,11 +476,11 @@ export default function PostDriverJob() {
                         className="space-y-5"
                       >
                         <div>
-                          <h2 className="text-lg font-extrabold text-slate-900">
+                          <h2 className="text-lg font-extrabold text-[var(--text)]">
                             Compensation & Job Details
                           </h2>
 
-                          <p className="mt-1 text-xs text-slate-500">
+                          <p className="mt-1 text-xs text-[var(--text-muted)]">
                             Add salary, requirements and vacancy details.
                           </p>
                         </div>
@@ -503,19 +488,16 @@ export default function PostDriverJob() {
                         {/* Salary */}
                         <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
                           <div>
-                            <label className="mb-2 block text-xs font-bold text-slate-800">
+                            <label className="mb-2 block text-xs font-bold text-[var(--text)]">
                               Compensation Model
                             </label>
 
                             <select
                               value={jobData.salaryType}
                               onChange={(e) =>
-                                updateField(
-                                  "salaryType",
-                                  e.target.value
-                                )
+                                updateField("salaryType", e.target.value)
                               }
-                              className="w-full rounded-xl border border-slate-200 bg-white px-3 py-3 text-sm font-medium text-slate-900 outline-none transition focus:border-blue-600 focus:ring-4 focus:ring-blue-600/10"
+                              className="w-full rounded-[var(--radius-md)] border border-[var(--border)] bg-[var(--surface)] px-3 py-3 text-sm font-medium text-[var(--text)] outline-none transition focus:border-[var(--primary)] focus:ring-4 focus:ring-[var(--focus-ring)]"
                             >
                               {salaryTypes.map((type) => (
                                 <option key={type} value={type}>
@@ -526,25 +508,22 @@ export default function PostDriverJob() {
                           </div>
 
                           <div>
-                            <label className="mb-2 block text-xs font-bold text-slate-800">
+                            <label className="mb-2 block text-xs font-bold text-[var(--text)]">
                               Offered Amount
                             </label>
 
                             <div className="relative">
-                              <Banknote className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+                              <Banknote className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[var(--text-subtle)]" />
 
                               <input
                                 type="text"
                                 required
                                 value={jobData.salaryAmount}
                                 onChange={(e) =>
-                                  updateField(
-                                    "salaryAmount",
-                                    e.target.value
-                                  )
+                                  updateField("salaryAmount", e.target.value)
                                 }
                                 placeholder="e.g. 34,000 SEK / month"
-                                className="w-full rounded-xl border border-slate-200 bg-white py-3 pl-10 pr-4 text-sm font-medium text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-blue-600 focus:ring-4 focus:ring-blue-600/10"
+                                className="w-full rounded-[var(--radius-md)] border border-[var(--border)] bg-[var(--surface)] py-3 pl-10 pr-4 text-sm font-medium text-[var(--text)] outline-none transition placeholder:text-[var(--text-subtle)] focus:border-[var(--primary)] focus:ring-4 focus:ring-[var(--focus-ring)]"
                               />
                             </div>
                           </div>
@@ -552,12 +531,12 @@ export default function PostDriverJob() {
 
                         {/* Start Date */}
                         <div>
-                          <label className="mb-2 block text-xs font-bold text-slate-800">
+                          <label className="mb-2 block text-xs font-bold text-[var(--text)]">
                             Target Start Date
                           </label>
 
                           <div className="relative">
-                            <Calendar className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+                            <Calendar className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[var(--text-subtle)]" />
 
                             <input
                               type="date"
@@ -565,14 +544,14 @@ export default function PostDriverJob() {
                               onChange={(e) =>
                                 updateField("startDate", e.target.value)
                               }
-                              className="w-full rounded-xl border border-slate-200 bg-white py-3 pl-10 pr-4 text-sm font-medium text-slate-900 outline-none transition focus:border-blue-600 focus:ring-4 focus:ring-blue-600/10"
+                              className="w-full rounded-[var(--radius-md)] border border-[var(--border)] bg-[var(--surface)] py-3 pl-10 pr-4 text-sm font-medium text-[var(--text)] outline-none transition focus:border-[var(--primary)] focus:ring-4 focus:ring-[var(--focus-ring)]"
                             />
                           </div>
                         </div>
 
                         {/* Requirements */}
                         <div>
-                          <label className="mb-2 block text-xs font-bold text-slate-800">
+                          <label className="mb-2 block text-xs font-bold text-[var(--text)]">
                             Requirements & Certifications
                           </label>
 
@@ -583,13 +562,13 @@ export default function PostDriverJob() {
                               updateField("requirements", e.target.value)
                             }
                             placeholder="e.g. YKB, Digital Driver Card, ADR..."
-                            className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm font-medium text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-blue-600 focus:ring-4 focus:ring-blue-600/10"
+                            className="w-full rounded-[var(--radius-md)] border border-[var(--border)] bg-[var(--surface)] px-4 py-3 text-sm font-medium text-[var(--text)] outline-none transition placeholder:text-[var(--text-subtle)] focus:border-[var(--primary)] focus:ring-4 focus:ring-[var(--focus-ring)]"
                           />
                         </div>
 
                         {/* Description */}
                         <div>
-                          <label className="mb-2 block text-xs font-bold text-slate-800">
+                          <label className="mb-2 block text-xs font-bold text-[var(--text)]">
                             Job Description
                           </label>
 
@@ -598,13 +577,10 @@ export default function PostDriverJob() {
                             required
                             value={jobData.jobDescription}
                             onChange={(e) =>
-                              updateField(
-                                "jobDescription",
-                                e.target.value
-                              )
+                              updateField("jobDescription", e.target.value)
                             }
                             placeholder="Describe daily duties, routes, truck models, working conditions..."
-                            className="w-full resize-none rounded-xl border border-slate-200 bg-white p-4 text-sm font-medium leading-6 text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-blue-600 focus:ring-4 focus:ring-blue-600/10"
+                            className="w-full resize-none rounded-[var(--radius-md)] border border-[var(--border)] bg-[var(--surface)] p-4 text-sm font-medium leading-6 text-[var(--text)] outline-none transition placeholder:text-[var(--text-subtle)] focus:border-[var(--primary)] focus:ring-4 focus:ring-[var(--focus-ring)]"
                           />
                         </div>
 
@@ -613,7 +589,7 @@ export default function PostDriverJob() {
                           <button
                             type="button"
                             onClick={() => setStep(1)}
-                            className="flex w-full items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white py-3.5 text-sm font-bold text-slate-700 transition hover:bg-slate-50 sm:w-1/3"
+                            className="flex w-full items-center justify-center gap-2 rounded-[var(--radius-md)] border border-[var(--border)] bg-[var(--surface)] py-3.5 text-sm font-bold text-[var(--text)] transition hover:bg-[var(--surface-muted)] sm:w-1/3"
                           >
                             <ArrowLeft className="h-4 w-4" />
                             Back
@@ -621,7 +597,7 @@ export default function PostDriverJob() {
 
                           <button
                             type="submit"
-                            className="flex w-full items-center justify-center gap-2 rounded-xl bg-blue-600 py-3.5 text-sm font-bold text-white shadow-lg shadow-blue-600/20 transition hover:bg-blue-700 active:scale-[0.99] sm:w-2/3"
+                            className="flex w-full items-center justify-center gap-2 rounded-[var(--radius-md)] bg-[var(--primary)] py-3.5 text-sm font-bold text-[var(--on-primary)] shadow-[var(--shadow-sm)] transition hover:bg-[var(--primary-hover)] active:bg-[var(--primary-active)] active:scale-[0.99] sm:w-2/3"
                           >
                             <CheckCircle2 className="h-4 w-4" />
                             Publish Job Post

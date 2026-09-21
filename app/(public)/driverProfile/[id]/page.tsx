@@ -1,766 +1,494 @@
 "use client";
-
-import { useState } from "react";
+import React, { useState } from "react";
 import {
-  ArrowLeft,
-  MapPin,
   Star,
-  ShieldCheck,
-  Briefcase,
-  GraduationCap,
   Phone,
   Mail,
-  Download,
+  MapPin,
+  Car,
+  ShieldCheck,
+  Clock,
   CheckCircle2,
+  AlertCircle,
+  FileText,
+  ChevronRight,
+  MoreVertical,
   Award,
-  CalendarCheck,
-  Truck,
-  BadgeCheck,
-  TrendingUp,
-  MessageSquare,
-  Bookmark,
-  X,
+  DollarSign,
+  Calendar,
+  Activity,
+  ArrowUpRight,
 } from "lucide-react";
-import { useRouter } from "next/navigation";
-import { AnimatePresence, motion } from "framer-motion";
 
-interface License {
-  name: string;
-  status: string;
-}
+export default function DriverProfileView() {
+  const [activeTab, setActiveTab] = useState("overview");
 
-interface Experience {
-  id: number;
-  company: string;
-  location: string;
-  role: string;
-  period: string;
-  type: string;
-  highlights: string[];
-}
-
-interface Education {
-  id: number;
-  institution: string;
-  degree: string;
-  year: string;
-}
-
-interface Driver {
-  id?: number | string;
-  name: string;
-  role: string;
-  location: string;
-  exp: string;
-  rating: string;
-  reviewCount: number;
-  salary: string;
-  verified: boolean;
-  initials: string;
-  phone: string;
-  email: string;
-  responseTime: string;
-  availability: string;
-  safetyScore: string;
-  vehicleTypes: string[];
-  languages: string[];
-  about: string;
-  licenses: License[];
-  experience: Experience[];
-  education: Education[];
-}
-
-interface DriverProfileProps {
-  driver?: Partial<Driver>;
-  onBack?: () => void;
-}
-
-const defaultDriver: Driver = {
-  name: "Lars Lindqvist",
-  role: "Heavy Truck Driver (CE) + YKB",
-  location: "Stockholm, Sweden",
-  exp: "8 Years",
-  rating: "4.9",
-  reviewCount: 24,
-  salary: "38,000 SEK/mo",
-  verified: true,
-  initials: "LL",
-  phone: "+46 70 123 4567",
-  email: "lars.lindqvist@drivercvs.se",
-  responseTime: "Usually replies in under 1 hour",
-  availability: "Available Immediately",
-  safetyScore: "Zero traffic violations / 8 yrs",
-
-  vehicleTypes: [
-    "Semi-trailer (Sveatruck)",
-    "Refrigerated (Kyltransport)",
-    "Tautliner",
-    "ADR Tanker",
-  ],
-
-  languages: ["Swedish (Native)", "English (Fluent)", "Finnish"],
-
-  about:
-    "Professional commercial driver with over 8 years of heavy transport experience covering Nordic freight corridors. Clean safety record, valid digital tachograph driver card, updated YKB certification, and proficient with modern Volvo and Scania fleet telematics.",
-
-  licenses: [
-    {
-      name: "Class CE (Heavy Freight & Trailer)",
-      status: "Verified by Transportstyrelsen",
+  // Driver mock data aligned with custom design system tokens
+  const driver = {
+    name: "Marcus Vance",
+    id: "DRV-84920",
+    rating: 4.92,
+    totalRides: 1420,
+    completionRate: "98.5%",
+    status: "Active",
+    joinedDate: "March 2023",
+    email: "marcus.vance@example.com",
+    phone: "+1 (555) 234-5678",
+    location: "Austin, Texas",
+    vehicle: {
+      model: "Toyota Camry Hybrid",
+      year: "2022",
+      plate: "TX-90210",
+      color: "Forest Green",
+      vin: "4T1B11HK5MW123456",
     },
-    {
-      name: "Class C (Heavy Rigid Truck)",
-      status: "Verified",
-    },
-    {
-      name: "YKB (Yrkeskompetensbevis)",
-      status: "Valid until 2028",
-    },
-    {
-      name: "Digital Tachograph Card (Förarkort)",
-      status: "Active",
-    },
-    {
-      name: "ADR General Cargo (Farligt gods)",
-      status: "Verified",
-    },
-  ],
-
-  experience: [
-    {
-      id: 1,
-      company: "Nordic Logistics AB",
-      location: "Stockholm",
-      role: "Senior Freight Driver (CE)",
-      period: "2021 - Present",
-      type: "Full-time",
-      highlights: [
-        "Operated regular night freight corridors connecting Stockholm, Jönköping, and Gothenburg.",
-        "Maintained a 99.8% on-time delivery metric with zero safety incidents across 350,000+ km.",
-        "Handled daily vehicle safety logs and digital tachograph compliance.",
-        "Ensured full compliance with EU driver hours and rest regulations.",
-      ],
-    },
-
-    {
-      id: 2,
-      company: "Svea Cold Chain Distribution",
-      location: "Uppsala",
-      role: "Regional Temperature-Controlled Driver",
-      period: "2018 - 2021",
-      type: "Full-time",
-      highlights: [
-        "Operated refrigerated delivery trucks under strict temperature monitoring.",
-        "Handled pharmaceutical and fresh grocery distribution to retail terminals.",
-        "Managed automated reefers and digital temperature logging.",
-        "Maintained accurate delivery documentation and vehicle inspection records.",
-      ],
-    },
-  ],
-
-  education: [
-    {
-      id: 1,
-      institution: "Stockholm Transport Academy (Transportgymnasiet)",
-      degree: "Commercial Vehicle Transport & Heavy Logistics",
-      year: "2018",
-    },
-  ],
-};
-
-export default function DriverProfileView({
-  driver,
-  onBack,
-}: DriverProfileProps) {
-  const router = useRouter();
-
-  const [interviewRequested, setInterviewRequested] = useState(false);
-  const [saved, setSaved] = useState(false);
-
-  const data: Driver = {
-    ...defaultDriver,
-    ...driver,
-    vehicleTypes: driver?.vehicleTypes ?? defaultDriver.vehicleTypes,
-    languages: driver?.languages ?? defaultDriver.languages,
-    licenses: driver?.licenses ?? defaultDriver.licenses,
-    experience: driver?.experience ?? defaultDriver.experience,
-    education: driver?.education ?? defaultDriver.education,
-  };
-
-  const handleBack = () => {
-    if (onBack) {
-      onBack();
-    } else {
-      router.push("/ExploreDrivers");
-    }
-  };
-
-  const handleDownloadCV = () => {
-    alert("Downloading verified driver CV...");
+    documents: [
+      { name: "Driver's License", status: "Verified", date: "Exp. 2028" },
+      { name: "Vehicle Registration", status: "Verified", date: "Exp. 2027" },
+      { name: "Background Check", status: "Verified", date: "Passed Apr 2026" },
+      {
+        name: "Insurance Certificate",
+        status: "Pending Review",
+        date: "Uploaded yesterday",
+      },
+    ],
+    recentRides: [
+      {
+        id: "R-9081",
+        date: "Today, 2:15 PM",
+        pickup: "Downtown Plaza",
+        dropoff: "Airport Terminal 2",
+        fare: "$34.50",
+        status: "Completed",
+      },
+      {
+        id: "R-9078",
+        date: "Today, 11:30 AM",
+        pickup: "West End Station",
+        dropoff: "Oakridge Mall",
+        fare: "$18.20",
+        status: "Completed",
+      },
+      {
+        id: "R-9065",
+        date: "Yesterday, 6:40 PM",
+        pickup: "Tech Park Block B",
+        dropoff: "Sunset Avenue",
+        fare: "$22.00",
+        status: "Completed",
+      },
+      {
+        id: "R-9042",
+        date: "Yesterday, 1:10 PM",
+        pickup: "Grand Avenue",
+        dropoff: "Central Park East",
+        fare: "$15.80",
+        status: "Completed",
+      },
+    ],
   };
 
   return (
-    <div className="min-h-screen bg-[#F7F7F7] px-4 py-8 sm:px-6 lg:px-8">
-      <div className="mx-auto max-w-6xl">
-        
+    <div className="min-h-screen bg-[var(--bg)] text-[var(--text)] p-4 sm:p-6 lg:p-8 font-sans">
+      <div className="max-w-6xl mx-auto space-y-6">
+        {/* --- BREADCRUMB & TOP HEADER ACTIONS --- */}
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div>
+            <div className="flex items-center gap-2 text-xs text-[var(--text-subtle)] mb-1">
+              <span>Drivers</span>
+              <span>/</span>
+              <span className="text-[var(--text)] font-medium">
+                {driver.id}
+              </span>
+            </div>
+            <h1 className="text-2xl sm:text-3xl font-bold text-[var(--text)]">
+              Driver Profile
+            </h1>
+          </div>
 
-        <motion.button
-          initial={{ opacity: 0, x: -10 }}
-          animate={{ opacity: 1, x: 0 }}
-          onClick={handleBack}
-          className="mb-6 inline-flex cursor-pointer items-center gap-2 rounded-xl border border-[#E5E5E5] bg-white px-4 py-2.5 text-xs font-bold text-[#404040] shadow-sm transition-all hover:border-[#111111] hover:bg-[#111111] hover:text-white"
-        >
-          <ArrowLeft className="h-4 w-4" />
-          Back to All Drivers
-        </motion.button>
+          <div className="flex items-center gap-3">
+            <button
+              type="button"
+              className="px-4 py-2 text-sm font-medium bg-[var(--surface)] hover:bg-[var(--surface-muted)] text-[var(--text)] border border-[var(--border)] rounded-[var(--radius)] shadow-[var(--shadow-xs)] transition-colors"
+            >
+              Edit Profile
+            </button>
+            <button
+              type="button"
+              className="px-4 py-2 text-sm font-medium bg-[var(--primary)] hover:bg-[var(--primary-hover)] active:bg-[var(--primary-active)] text-[var(--on-primary)] rounded-[var(--radius)] shadow-[var(--shadow-xs)] transition-colors focus:outline-none focus:ring-4 focus:ring-[var(--focus-ring)]"
+            >
+              Assign Trip
+            </button>
+          </div>
+        </div>
 
-        {/* =====================================================
-            PROFILE HEADER
-        ====================================================== */}
-
-        <motion.div
-          initial={{ opacity: 0, y: 15 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.35 }}
-          className="relative overflow-hidden rounded-3xl border border-[#E5E5E5] bg-white p-6 shadow-sm sm:p-8"
-        >
-          {/* Decorative Background */}
-
-          <div className="pointer-events-none absolute right-0 top-0 h-40 w-40 rounded-full bg-[#F1F1F1] blur-3xl" />
-
-          <div className="relative flex flex-col gap-6 lg:flex-row lg:items-start lg:justify-between">
-            {/* Driver Information */}
-
-            <div className="flex flex-col gap-5 sm:flex-row sm:items-center">
-              {/* Avatar */}
-
-              <div className="relative flex h-20 w-20 shrink-0 items-center justify-center rounded-2xl border border-[#DADADA] bg-[#111111] text-2xl font-black text-white">
-                {data.initials}
-
-                {data.verified && (
-                  <span className="absolute -bottom-1.5 -right-1.5 flex h-6 w-6 items-center justify-center rounded-full bg-white text-[#111111] ring-2 ring-white">
-                    <BadgeCheck className="h-4 w-4 fill-[#111111]" />
-                  </span>
-                )}
+        {/* --- MAIN PROFILE BANNER CARD --- */}
+        <div className="bg-[var(--surface)] border border-[var(--border)] rounded-[var(--radius-lg)] p-6 shadow-[var(--shadow-sm)]">
+          <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+            {/* Driver Identity */}
+            <div className="flex items-start sm:items-center gap-4">
+              <div className="relative">
+                <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-[var(--radius-lg)] bg-[var(--primary-100)] text-[var(--primary-800)] flex items-center justify-center text-2xl font-bold border-2 border-[var(--primary-200)]">
+                  MV
+                </div>
+                <span className="absolute -bottom-1 -right-1 p-1 bg-[var(--success)] text-white rounded-full border-2 border-[var(--surface)]">
+                  <CheckCircle2 className="w-4 h-4" />
+                </span>
               </div>
 
-              <div>
-                <div className="flex flex-wrap items-center gap-2">
-                  <h1 className="text-xl font-extrabold tracking-tight text-[#111111] sm:text-2xl">
-                    {data.name}
-                  </h1>
-
-                  {data.verified && (
-                    <span className="inline-flex items-center gap-1 rounded-full bg-[#111111] px-2.5 py-1 text-[10px] font-bold text-white">
-                      <ShieldCheck className="h-3 w-3" />
-                      Verified Driver
-                    </span>
-                  )}
+              <div className="space-y-1">
+                <div className="flex items-center gap-3">
+                  <h2 className="text-xl sm:text-2xl font-bold text-[var(--text)]">
+                    {driver.name}
+                  </h2>
+                  <span className="px-2.5 py-0.5 text-xs font-semibold rounded-[var(--radius-sm)] bg-[var(--success-bg)] text-[var(--success)] border border-[var(--success)]/20">
+                    {driver.status}
+                  </span>
                 </div>
 
-                <p className="mt-1 text-xs font-bold text-[#111111] sm:text-sm">
-                  {data.role}
+                <p className="text-sm text-[var(--text-muted)] flex items-center gap-1.5">
+                  <Car className="w-4 h-4 text-[var(--text-subtle)]" />
+                  {driver.vehicle.color} {driver.vehicle.model} •{" "}
+                  <span className="font-mono text-xs">
+                    {driver.vehicle.plate}
+                  </span>
                 </p>
 
-                <div className="mt-2.5 flex flex-wrap items-center gap-x-4 gap-y-2 text-xs font-medium text-[#737373]">
-                  <span className="flex items-center gap-1.5">
-                    <MapPin className="h-3.5 w-3.5 text-[#737373]" />
-                    {data.location}
+                <div className="flex flex-wrap items-center gap-4 pt-1 text-xs text-[var(--text-subtle)]">
+                  <span className="flex items-center gap-1">
+                    <MapPin className="w-3.5 h-3.5" />
+                    {driver.location}
                   </span>
-
-                  <span className="flex items-center gap-1.5">
-                    <Star className="h-3.5 w-3.5 fill-[#111111] text-[#111111]" />
-                    <b className="text-[#111111]">{data.rating}</b>(
-                    {data.reviewCount} employer reviews)
-                  </span>
-                </div>
-
-                <div className="mt-3 flex flex-wrap items-center gap-2">
-                  {/* Availability */}
-
-                  <span className="inline-flex items-center gap-1.5 rounded-full border border-[#DADADA] bg-[#F3F3F3] px-3 py-1 text-[10px] font-bold text-[#111111]">
-                    <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-[#111111]" />
-                    {data.availability}
-                  </span>
-
-                  {/* Response */}
-
-                  <span className="inline-flex items-center gap-1.5 rounded-full bg-[#F3F3F3] px-3 py-1 text-[10px] font-medium text-[#666666]">
-                    <MessageSquare className="h-3 w-3 text-[#737373]" />
-                    {data.responseTime}
+                  <span>•</span>
+                  <span className="flex items-center gap-1">
+                    <Clock className="w-3.5 h-3.5" />
+                    Joined {driver.joinedDate}
                   </span>
                 </div>
               </div>
             </div>
 
-            {/* =================================================
-                QUICK ACTIONS
-            ================================================== */}
+            {/* Quick Rating & Completion Metrics */}
+            <div className="w-full md:w-auto flex items-center justify-between md:justify-end gap-6 pt-4 md:pt-0 border-t md:border-t-0 border-[var(--border)]">
+              <div className="text-left md:text-right">
+                <div className="flex items-center md:justify-end gap-1 text-[var(--warning)] font-bold text-lg">
+                  <Star className="w-5 h-5 fill-[var(--warning)] text-[var(--warning)]" />
+                  <span>{driver.rating}</span>
+                </div>
+                <p className="text-xs text-[var(--text-muted)]">
+                  Rating (480 reviews)
+                </p>
+              </div>
 
-            <div className="flex w-full shrink-0 flex-col gap-2 sm:w-52">
-              <button
-                onClick={() => setInterviewRequested(true)}
-                className="flex cursor-pointer items-center justify-center gap-2 rounded-xl bg-[#111111] px-5 py-3 text-xs font-bold text-white shadow-md transition-all hover:bg-[#2A2A2A]"
-              >
-                <CalendarCheck className="h-4 w-4" />
-                Contact & Hire
-              </button>
+              <div className="h-8 w-px bg-[var(--border)] hidden sm:block"></div>
 
-              <div className="flex gap-2">
-                <a
-                  href={`mailto:${data.email}`}
-                  className="flex flex-1 items-center justify-center gap-1.5 rounded-xl border border-[#E5E5E5] bg-[#F7F7F7] px-3 py-2.5 text-xs font-bold text-[#404040] transition-colors hover:bg-[#111111] hover:text-white"
-                >
-                  <Mail className="h-3.5 w-3.5" />
-                  Email
-                </a>
+              <div className="text-left md:text-right">
+                <p className="text-lg font-bold text-[var(--text)]">
+                  {driver.totalRides}
+                </p>
+                <p className="text-xs text-[var(--text-muted)]">Total Trips</p>
+              </div>
 
+              <div className="h-8 w-px bg-[var(--border)] hidden sm:block"></div>
+
+              <div className="text-left md:text-right">
+                <p className="text-lg font-bold text-[var(--primary)]">
+                  {driver.completionRate}
+                </p>
+                <p className="text-xs text-[var(--text-muted)]">Completion</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* --- KEY STATS GRID --- */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div className="bg-[var(--surface)] border border-[var(--border)] p-4 rounded-[var(--radius-md)] shadow-[var(--shadow-xs)]">
+            <div className="flex items-center justify-between">
+              <span className="text-xs text-[var(--text-subtle)] font-medium uppercase tracking-wider">
+                Weekly Revenue
+              </span>
+              <div className="p-2 bg-[var(--surface-muted)] text-[var(--primary)] rounded-[var(--radius-sm)]">
+                <DollarSign className="w-4 h-4" />
+              </div>
+            </div>
+            <p className="text-2xl font-bold text-[var(--text)] mt-2">
+              $1,240.50
+            </p>
+            <p className="text-xs text-[var(--success)] font-medium mt-1 flex items-center gap-0.5">
+              <ArrowUpRight className="w-3.5 h-3.5" /> +12.4% vs last week
+            </p>
+          </div>
+
+          <div className="bg-[var(--surface)] border border-[var(--border)] p-4 rounded-[var(--radius-md)] shadow-[var(--shadow-xs)]">
+            <div className="flex items-center justify-between">
+              <span className="text-xs text-[var(--text-subtle)] font-medium uppercase tracking-wider">
+                Hours Online
+              </span>
+              <div className="p-2 bg-[var(--surface-muted)] text-[var(--primary)] rounded-[var(--radius-sm)]">
+                <Clock className="w-4 h-4" />
+              </div>
+            </div>
+            <p className="text-2xl font-bold text-[var(--text)] mt-2">
+              38.5 hrs
+            </p>
+            <p className="text-xs text-[var(--text-muted)] mt-1">
+              Target: 40 hrs/week
+            </p>
+          </div>
+
+          <div className="bg-[var(--surface)] border border-[var(--border)] p-4 rounded-[var(--radius-md)] shadow-[var(--shadow-xs)]">
+            <div className="flex items-center justify-between">
+              <span className="text-xs text-[var(--text-subtle)] font-medium uppercase tracking-wider">
+                Acceptance Rate
+              </span>
+              <div className="p-2 bg-[var(--surface-muted)] text-[var(--primary)] rounded-[var(--radius-sm)]">
+                <Activity className="w-4 h-4" />
+              </div>
+            </div>
+            <p className="text-2xl font-bold text-[var(--text)] mt-2">94%</p>
+            <p className="text-xs text-[var(--success)] font-medium mt-1">
+              Top tier driver
+            </p>
+          </div>
+
+          <div className="bg-[var(--surface)] border border-[var(--border)] p-4 rounded-[var(--radius-md)] shadow-[var(--shadow-xs)]">
+            <div className="flex items-center justify-between">
+              <span className="text-xs text-[var(--text-subtle)] font-medium uppercase tracking-wider">
+                Safety Score
+              </span>
+              <div className="p-2 bg-[var(--surface-muted)] text-[var(--primary)] rounded-[var(--radius-sm)]">
+                <ShieldCheck className="w-4 h-4" />
+              </div>
+            </div>
+            <p className="text-2xl font-bold text-[var(--text)] mt-2">
+              99 / 100
+            </p>
+            <p className="text-xs text-[var(--text-muted)] mt-1">
+              0 incidents reported
+            </p>
+          </div>
+        </div>
+
+        {/* --- TABS NAVIGATION --- */}
+        <div className="border-b border-[var(--border)] flex items-center gap-6 text-sm font-medium">
+          {["overview", "trips", "documents", "vehicle"].map((tab) => (
+            <button
+              key={tab}
+              onClick={() => setActiveTab(tab)}
+              className={`pb-3 capitalize transition-colors relative ${
+                activeTab === tab
+                  ? "text-[var(--primary)] font-semibold"
+                  : "text-[var(--text-muted)] hover:text-[var(--text)]"
+              }`}
+            >
+              {tab}
+              {activeTab === tab && (
+                <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-[var(--primary)] rounded-full" />
+              )}
+            </button>
+          ))}
+        </div>
+
+        {/* --- TAB CONTENT AREA --- */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {/* LEFT 2 COLUMNS */}
+          <div className="lg:col-span-2 space-y-6">
+            {/* Recent Trips List */}
+            <div className="bg-[var(--surface)] border border-[var(--border)] rounded-[var(--radius-lg)] p-5 shadow-[var(--shadow-xs)]">
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-base font-bold text-[var(--text)]">
+                  Recent Trips
+                </h3>
                 <button
-                  aria-label="Save driver"
-                  onClick={() => setSaved((prev) => !prev)}
-                  className={`flex cursor-pointer items-center justify-center rounded-xl border px-3 py-2.5 transition-colors ${
-                    saved
-                      ? "border-[#111111] bg-[#111111] text-white"
-                      : "border-[#E5E5E5] bg-[#F7F7F7] text-[#737373] hover:bg-[#111111] hover:text-white"
-                  }`}
+                  type="button"
+                  className="text-xs text-[var(--primary)] font-semibold hover:underline flex items-center gap-1"
                 >
-                  <Bookmark
-                    className={`h-3.5 w-3.5 ${saved ? "fill-white" : ""}`}
-                  />
+                  View All <ChevronRight className="w-3.5 h-3.5" />
                 </button>
               </div>
 
-              <button
-                onClick={handleDownloadCV}
-                className="flex cursor-pointer items-center justify-center gap-1.5 pt-1 text-xs font-bold text-[#111111] transition-colors hover:text-[#666666]"
-              >
-                <Download className="h-3.5 w-3.5" />
-                Download Verified CV
-              </button>
-            </div>
-          </div>
-        </motion.div>
-
-        {/* =====================================================
-            MAIN CONTENT
-        ====================================================== */}
-
-        <div className="mt-6 grid grid-cols-1 gap-6 lg:grid-cols-12">
-          {/* =================================================
-              LEFT COLUMN
-          ================================================== */}
-
-          <div className="space-y-6 lg:col-span-8">
-            {/* =================================================
-                ABOUT
-            ================================================== */}
-
-            <motion.section
-              initial={{ opacity: 0, y: 15 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.05 }}
-              className="rounded-2xl border border-[#E5E5E5] bg-white p-6 shadow-sm"
-            >
-              <h2 className="text-xs font-bold uppercase tracking-wider text-[#111111]">
-                Driver Background & Summary
-              </h2>
-
-              <p className="mt-3 text-xs leading-relaxed text-[#666666] sm:text-sm">
-                {data.about}
-              </p>
-
-              {/* Vehicle Types */}
-
-              <div className="mt-5">
-                <h3 className="mb-2 text-[11px] font-bold uppercase tracking-wide text-[#999999]">
-                  Vehicle Experience
-                </h3>
-
-                <div className="flex flex-wrap gap-1.5">
-                  {data.vehicleTypes.map((vehicle) => (
-                    <span
-                      key={vehicle}
-                      className="inline-flex items-center gap-1.5 rounded-lg border border-[#E5E5E5] bg-[#F7F7F7] px-2.5 py-1.5 text-xs font-medium text-[#404040]"
-                    >
-                      <Truck className="h-3.5 w-3.5 text-[#111111]" />
-                      {vehicle}
-                    </span>
-                  ))}
-                </div>
-              </div>
-            </motion.section>
-
-            {/* =================================================
-                EXPERIENCE
-            ================================================== */}
-
-            <motion.section
-              initial={{ opacity: 0, y: 15 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.1 }}
-              className="rounded-2xl border border-[#E5E5E5] bg-white p-6 shadow-sm"
-            >
-              <div className="flex items-center gap-2 border-b border-[#EEEEEE] pb-3.5">
-                <Briefcase className="h-4 w-4 text-[#111111]" />
-
-                <h2 className="text-xs font-bold uppercase tracking-wider text-[#111111]">
-                  Driving Experience
-                </h2>
-              </div>
-
-              <div className="mt-5 space-y-6">
-                {data.experience.map((item) => (
+              <div className="divide-y divide-[var(--border-subtle)]">
+                {driver.recentRides.map((ride) => (
                   <div
-                    key={item.id}
-                    className="relative pl-6 before:absolute before:left-0 before:top-1.5 before:h-full before:w-[2px] before:bg-[#E5E5E5] last:before:hidden"
+                    key={ride.id}
+                    className="py-3 first:pt-0 last:pb-0 flex items-center justify-between gap-4"
                   >
-                    <div className="absolute -left-[5px] top-1.5 h-2.5 w-2.5 rounded-full border-2 border-white bg-[#111111]" />
-
-                    <div className="flex flex-col justify-between gap-1 sm:flex-row sm:items-center">
-                      <h3 className="text-xs font-bold text-[#111111] sm:text-sm">
-                        {item.role}
-                      </h3>
-
-                      <span className="text-[11px] font-semibold text-[#999999]">
-                        {item.period}
-                      </span>
-                    </div>
-
-                    <p className="mt-0.5 text-xs font-semibold text-[#111111]">
-                      {item.company}
-
-                      <span className="font-normal text-[#999999]">
-                        {" "}
-                        • {item.location}
-                      </span>
-                    </p>
-
-                    <span className="mt-1 inline-block rounded-full bg-[#F1F1F1] px-2 py-0.5 text-[9px] font-semibold text-[#666666]">
-                      {item.type}
-                    </span>
-
-                    <ul className="mt-3 space-y-1.5 text-xs text-[#666666]">
-                      {item.highlights.map((point, idx) => (
-                        <li
-                          key={`${item.id}-${idx}`}
-                          className="flex items-start gap-2"
-                        >
-                          <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-[#737373]" />
-                          <span>{point}</span>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                ))}
-              </div>
-            </motion.section>
-
-            {/* =================================================
-                EDUCATION
-            ================================================== */}
-
-            <motion.section
-              initial={{ opacity: 0, y: 15 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.15 }}
-              className="rounded-2xl border border-[#E5E5E5] bg-white p-6 shadow-sm"
-            >
-              <div className="flex items-center gap-2 border-b border-[#EEEEEE] pb-3.5">
-                <GraduationCap className="h-4 w-4 text-[#111111]" />
-
-                <h2 className="text-xs font-bold uppercase tracking-wider text-[#111111]">
-                  Transport Certifications & Education
-                </h2>
-              </div>
-
-              <div className="mt-4 space-y-3">
-                {data.education.map((edu) => (
-                  <div
-                    key={edu.id}
-                    className="flex items-start justify-between gap-4 rounded-xl border border-[#EAEAEA] bg-[#F7F7F7] p-3.5"
-                  >
-                    <div>
-                      <h3 className="text-xs font-bold text-[#111111]">
-                        {edu.degree}
-                      </h3>
-
-                      <p className="mt-0.5 text-[11px] text-[#737373]">
-                        {edu.institution}
+                    <div className="space-y-1">
+                      <div className="flex items-center gap-2">
+                        <span className="font-mono text-xs font-semibold text-[var(--text)]">
+                          {ride.id}
+                        </span>
+                        <span className="text-xs text-[var(--text-subtle)]">
+                          • {ride.date}
+                        </span>
+                      </div>
+                      <p className="text-sm font-medium text-[var(--text)]">
+                        {ride.pickup}{" "}
+                        <span className="text-[var(--text-subtle)] font-normal">
+                          →
+                        </span>{" "}
+                        {ride.dropoff}
                       </p>
                     </div>
 
-                    <span className="shrink-0 text-[11px] font-bold text-[#999999]">
-                      {edu.year}
-                    </span>
+                    <div className="text-right">
+                      <p className="text-sm font-bold text-[var(--text)]">
+                        {ride.fare}
+                      </p>
+                      <span className="text-xs text-[var(--success)] font-medium">
+                        {ride.status}
+                      </span>
+                    </div>
                   </div>
                 ))}
               </div>
-            </motion.section>
+            </div>
+
+            {/* Document Verification Section */}
+            <div className="bg-[var(--surface)] border border-[var(--border)] rounded-[var(--radius-lg)] p-5 shadow-[var(--shadow-xs)]">
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-base font-bold text-[var(--text)]">
+                  Compliance & Documents
+                </h3>
+                <span className="text-xs text-[var(--text-muted)]">
+                  4 Uploaded
+                </span>
+              </div>
+
+              <div className="space-y-3">
+                {driver.documents.map((doc, idx) => (
+                  <div
+                    key={idx}
+                    className="flex items-center justify-between p-3 rounded-[var(--radius)] border border-[var(--border-subtle)] bg-[var(--surface-subtle)]"
+                  >
+                    <div className="flex items-center gap-3">
+                      <div className="p-2 bg-[var(--surface)] border border-[var(--border)] rounded-[var(--radius-sm)] text-[var(--text-muted)]">
+                        <FileText className="w-4 h-4" />
+                      </div>
+                      <div>
+                        <p className="text-sm font-medium text-[var(--text)]">
+                          {doc.name}
+                        </p>
+                        <p className="text-xs text-[var(--text-subtle)]">
+                          {doc.date}
+                        </p>
+                      </div>
+                    </div>
+
+                    <div>
+                      {doc.status === "Verified" ? (
+                        <span className="inline-flex items-center gap-1 text-xs px-2.5 py-1 rounded-[var(--radius-sm)] bg-[var(--success-bg)] text-[var(--success)] font-medium">
+                          <CheckCircle2 className="w-3 h-3" />
+                          Verified
+                        </span>
+                      ) : (
+                        <span className="inline-flex items-center gap-1 text-xs px-2.5 py-1 rounded-[var(--radius-sm)] bg-[var(--warning-bg)] text-[var(--warning)] font-medium">
+                          <AlertCircle className="w-3 h-3" />
+                          Pending Review
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
           </div>
 
-          {/* =================================================
-              RIGHT SIDEBAR
-          ================================================== */}
+          {/* RIGHT COLUMN */}
+          <div className="space-y-6">
+            {/* Contact Details Card */}
+            <div className="bg-[var(--surface)] border border-[var(--border)] rounded-[var(--radius-lg)] p-5 shadow-[var(--shadow-xs)] space-y-4">
+              <h3 className="text-base font-bold text-[var(--text)]">
+                Contact Information
+              </h3>
 
-          <div className="space-y-6 lg:col-span-4">
-            {/* =================================================
-                COMPLIANCE
-            ================================================== */}
-
-            <motion.section
-              initial={{ opacity: 0, x: 15 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: 0.1 }}
-              className="rounded-2xl border border-[#DADADA] bg-[#111111] p-5 text-white"
-            >
-              <div className="mb-4 flex items-center gap-2">
-                <ShieldCheck className="h-4 w-4 text-white" />
-
-                <h2 className="text-xs font-bold uppercase tracking-wider text-white">
-                  Compliance Status
-                </h2>
-              </div>
-
-              <div className="space-y-3 text-xs">
-                <div className="flex items-center justify-between gap-3">
-                  <span className="text-white/70">
-                    Transportstyrelsen Validated
-                  </span>
-
-                  <CheckCircle2 className="h-4 w-4 shrink-0 text-white" />
-                </div>
-
-                <div className="flex items-center justify-between gap-3">
-                  <span className="text-white/70">
-                    Background Record Cleared
-                  </span>
-
-                  <CheckCircle2 className="h-4 w-4 shrink-0 text-white" />
-                </div>
-
-                <div className="flex items-center justify-between gap-3">
-                  <span className="text-white/70">Safety Incident History</span>
-
-                  <span className="font-bold text-white">0 Infractions</span>
-                </div>
-              </div>
-            </motion.section>
-
-            {/* =================================================
-                QUICK OVERVIEW
-            ================================================== */}
-
-            <motion.section
-              initial={{ opacity: 0, x: 15 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: 0.15 }}
-              className="rounded-2xl border border-[#E5E5E5] bg-white p-5 shadow-sm"
-            >
-              <div className="mb-4 flex items-center gap-2">
-                <TrendingUp className="h-4 w-4 text-[#111111]" />
-
-                <h2 className="text-xs font-bold uppercase tracking-wider text-[#111111]">
-                  Quick Overview
-                </h2>
-              </div>
-
-              <div className="space-y-3 text-xs">
-                <div className="flex justify-between gap-4 border-b border-[#EEEEEE] pb-2">
-                  <span className="text-[#999999]">Commercial Experience</span>
-
-                  <span className="font-bold text-[#111111]">{data.exp}</span>
-                </div>
-
-                <div className="flex justify-between gap-4 border-b border-[#EEEEEE] pb-2">
-                  <span className="text-[#999999]">Expected Compensation</span>
-
-                  <span className="font-bold text-[#111111]">
-                    {data.salary}
+              <div className="space-y-3 text-sm">
+                <div className="flex items-center gap-3 text-[var(--text-muted)]">
+                  <Mail className="w-4 h-4 text-[var(--text-subtle)] flex-shrink-0" />
+                  <span className="truncate text-[var(--text)]">
+                    {driver.email}
                   </span>
                 </div>
 
-                <div className="flex justify-between gap-4 border-b border-[#EEEEEE] pb-2">
-                  <span className="text-[#999999]">Employment Type</span>
-
-                  <span className="font-bold text-[#111111]">Full-time</span>
+                <div className="flex items-center gap-3 text-[var(--text-muted)]">
+                  <Phone className="w-4 h-4 text-[var(--text-subtle)] flex-shrink-0" />
+                  <span className="text-[var(--text)]">{driver.phone}</span>
                 </div>
 
-                <div className="flex justify-between gap-4 border-b border-[#EEEEEE] pb-2">
-                  <span className="text-[#999999]">Languages</span>
-
-                  <span className="max-w-[60%] text-right font-bold text-[#111111]">
-                    {data.languages.join(", ")}
-                  </span>
-                </div>
-
-                <div className="flex justify-between gap-4">
-                  <span className="text-[#999999]">Dispatch Status</span>
-
-                  <span className="font-bold text-[#111111]">Available</span>
+                <div className="flex items-center gap-3 text-[var(--text-muted)]">
+                  <MapPin className="w-4 h-4 text-[var(--text-subtle)] flex-shrink-0" />
+                  <span className="text-[var(--text)]">{driver.location}</span>
                 </div>
               </div>
-            </motion.section>
 
-            {/* =================================================
-                LICENSES
-            ================================================== */}
-
-            {/* =================================================
-                DIRECT CONTACT
-            ================================================== */}
-
-            <motion.section
-              initial={{ opacity: 0, x: 15 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: 0.25 }}
-              className="rounded-2xl border border-[#E5E5E5] bg-white p-5 shadow-sm"
-            >
-              <h2 className="mb-4 text-xs font-bold uppercase tracking-wider text-[#111111]">
-                Direct Contact
-              </h2>
-
-              <div className="space-y-3 text-xs text-[#404040]">
-                <a
-                  href={`tel:${data.phone}`}
-                  className="flex items-center gap-2 transition-colors hover:text-[#111111]"
+              <div className="pt-2 border-t border-[var(--border)] flex gap-2">
+                <button
+                  type="button"
+                  className="w-full py-2 bg-[var(--surface-muted)] hover:bg-[var(--primary)] hover:text-white border border-[var(--border)] text-[var(--text)] text-xs font-semibold rounded-[var(--radius-sm)] transition-colors flex items-center justify-center gap-1"
                 >
-                  <Phone className="h-3.5 w-3.5 text-[#111111]" />
-                  <span>{data.phone}</span>
-                </a>
-
-                <a
-                  href={`mailto:${data.email}`}
-                  className="flex items-center gap-2 transition-colors hover:text-[#111111]"
+                  <Mail className="w-3.5 h-3.5" /> Email
+                </button>
+                <button
+                  type="button"
+                  className="w-full py-2 bg-[var(--surface-muted)] hover:bg-[var(--primary)] hover:text-white border border-[var(--border)] text-[var(--text)] text-xs font-semibold rounded-[var(--radius-sm)] transition-colors flex items-center justify-center gap-1"
                 >
-                  <Mail className="h-3.5 w-3.5 text-[#111111]" />
-
-                  <span className="truncate">{data.email}</span>
-                </a>
+                  <Phone className="w-3.5 h-3.5" /> Call
+                </button>
               </div>
-            </motion.section>
+            </div>
+
+            {/* Vehicle Card */}
+            <div className="bg-[var(--surface)] border border-[var(--border)] rounded-[var(--radius-lg)] p-5 shadow-[var(--shadow-xs)] space-y-4">
+              <div className="flex items-center justify-between">
+                <h3 className="text-base font-bold text-[var(--text)]">
+                  Assigned Vehicle
+                </h3>
+                <span className="p-1 text-[var(--text-subtle)] hover:text-[var(--text)] cursor-pointer">
+                  <MoreVertical className="w-4 h-4" />
+                </span>
+              </div>
+
+              <div className="p-3 bg-[var(--surface-muted)] border border-[var(--border-subtle)] rounded-[var(--radius)] flex items-center gap-3">
+                <Car className="w-8 h-8 text-[var(--primary)] flex-shrink-0" />
+                <div>
+                  <p className="text-sm font-bold text-[var(--text)]">
+                    {driver.vehicle.model}
+                  </p>
+                  <p className="text-xs text-[var(--text-muted)]">
+                    {driver.vehicle.year} • {driver.vehicle.color}
+                  </p>
+                </div>
+              </div>
+
+              <div className="space-y-2 text-xs">
+                <div className="flex justify-between py-1 border-b border-[var(--border-subtle)]">
+                  <span className="text-[var(--text-subtle)]">
+                    License Plate
+                  </span>
+                  <span className="font-mono font-bold text-[var(--text)]">
+                    {driver.vehicle.plate}
+                  </span>
+                </div>
+                <div className="flex justify-between py-1 border-b border-[var(--border-subtle)]">
+                  <span className="text-[var(--text-subtle)]">VIN</span>
+                  <span className="font-mono text-[var(--text-muted)] text-[11px]">
+                    {driver.vehicle.vin}
+                  </span>
+                </div>
+                <div className="flex justify-between py-1">
+                  <span className="text-[var(--text-subtle)]">
+                    Inspection Status
+                  </span>
+                  <span className="font-medium text-[var(--success)]">
+                    Passed (2026)
+                  </span>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
-
-      {/* =====================================================
-          CONTACT / HIRE MODAL
-      ====================================================== */}
-
-      <AnimatePresence>
-        {interviewRequested && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 backdrop-blur-sm"
-            onClick={() => setInterviewRequested(false)}
-          >
-            <motion.div
-              initial={{
-                opacity: 0,
-                scale: 0.95,
-                y: 10,
-              }}
-              animate={{
-                opacity: 1,
-                scale: 1,
-                y: 0,
-              }}
-              exit={{
-                opacity: 0,
-                scale: 0.95,
-                y: 10,
-              }}
-              transition={{ duration: 0.2 }}
-              onClick={(event) => event.stopPropagation()}
-              className="w-full max-w-md rounded-3xl bg-white p-6 shadow-2xl"
-            >
-              {/* Modal Header */}
-
-              <div className="flex items-center justify-between border-b border-[#EEEEEE] pb-4">
-                <div className="flex items-center gap-2">
-                  <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-[#111111]">
-                    <CalendarCheck className="h-5 w-5 text-white" />
-                  </div>
-
-                  <div>
-                    <h3 className="text-sm font-bold text-[#111111]">
-                      Contact Driver
-                    </h3>
-
-                    <p className="text-[10px] text-[#999999]">
-                      Start a hiring conversation
-                    </p>
-                  </div>
-                </div>
-
-                <button
-                  onClick={() => setInterviewRequested(false)}
-                  className="cursor-pointer rounded-full p-2 text-[#999999] transition-colors hover:bg-[#F3F3F3] hover:text-[#111111]"
-                >
-                  <X className="h-4 w-4" />
-                </button>
-              </div>
-
-              {/* Modal Content */}
-
-              <div className="mt-5">
-                <div className="rounded-2xl border border-[#E5E5E5] bg-[#F7F7F7] p-4">
-                  <div className="flex items-center gap-3">
-                    <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-[#111111] font-bold text-white shadow-sm">
-                      {data.initials}
-                    </div>
-
-                    <div>
-                      <p className="text-sm font-bold text-[#111111]">
-                        {data.name}
-                      </p>
-
-                      <p className="text-xs text-[#737373]">{data.role}</p>
-                    </div>
-                  </div>
-                </div>
-
-                <p className="mt-4 text-xs leading-relaxed text-[#666666]">
-                  Your hiring request will be sent to{" "}
-                  <strong className="text-[#111111]">{data.name}</strong>. The
-                  driver can respond through phone or your in-app messaging
-                  system.
-                </p>
-
-                <div className="mt-4 space-y-2">
-                  <a
-                    href={`tel:${data.phone}`}
-                    className="flex items-center justify-center gap-2 rounded-xl border border-[#E5E5E5] px-4 py-2.5 text-xs font-bold text-[#404040] transition-colors hover:bg-[#F7F7F7]"
-                  >
-                    <Phone className="h-3.5 w-3.5" />
-                    Call Driver
-                  </a>
-
-                  <a
-                    href={`mailto:${data.email}`}
-                    className="flex items-center justify-center gap-2 rounded-xl bg-[#111111] px-4 py-2.5 text-xs font-bold text-white transition-colors hover:bg-[#2A2A2A]"
-                  >
-                    <Mail className="h-3.5 w-3.5" />
-                    Send Hiring Email
-                  </a>
-                </div>
-              </div>
-
-              {/* Modal Footer */}
-
-              <div className="mt-5 flex justify-end">
-                <button
-                  onClick={() => setInterviewRequested(false)}
-                  className="cursor-pointer rounded-xl px-4 py-2 text-xs font-bold text-[#737373] transition-colors hover:bg-[#F3F3F3] hover:text-[#111111]"
-                >
-                  Close
-                </button>
-              </div>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
     </div>
   );
 }
