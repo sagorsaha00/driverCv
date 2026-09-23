@@ -1,7 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
+
 import { AnimatePresence, motion } from "framer-motion";
+
 import {
   ArrowLeft,
   ArrowRight,
@@ -10,10 +12,18 @@ import {
   Building2,
   Calendar,
   CheckCircle2,
+  Loader2,
   MapPin,
   ShieldCheck,
 } from "lucide-react";
+
 import { useRouter } from "next/navigation";
+import axios from "axios";
+
+import { useAuthStore } from "@/store/authStore";
+
+import type { HR } from "@/type/auth";
+import { useCreateJob } from "@/lib/api/apiCall";
 
 const vehicleCategories = [
   "Personbil / Private Car (B)",
@@ -58,6 +68,10 @@ const salaryTypes = [
   "Enligt Kollektivavtal (Collective Agreement)",
 ];
 
+/* ============================================================
+   TYPES
+============================================================ */
+
 type JobData = {
   jobTitle: string;
   companyName: string;
@@ -73,26 +87,96 @@ type JobData = {
   requiresTKT: boolean;
 };
 
+/* ============================================================
+   INITIAL DATA
+============================================================ */
+
+const createInitialJobData = (companyName = ""): JobData => ({
+  jobTitle: "",
+  companyName,
+
+  location: "Stockholm",
+
+  vehicleRequired: "Tung Lastbil / Heavy Truck (C)",
+
+  employmentType: "Heltid (Full-time)",
+
+  workingHours: "Dagtid (Day Shift)",
+
+  salaryType: "Fast Månadslön (Fixed Monthly SEK)",
+
+  salaryAmount: "",
+  startDate: "",
+  jobDescription: "",
+
+  requirements: "Giltigt YKB, Digitalt Förarkort",
+
+  requiresTKT: false,
+});
+
+/* ============================================================
+   COMPONENT
+============================================================ */
+
 export default function PostDriverJob() {
   const router = useRouter();
 
+  /* ==========================================================
+     AUTH
+  ========================================================== */
+
+  const user = useAuthStore((state) => state.user);
+
+  const role = useAuthStore((state) => state.role);
+
+  const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
+
+  const hr: HR | null = role === "hr" && user ? (user as HR) : null;
+
+  const createJobMutation = useCreateJob();
+
   const [step, setStep] = useState(1);
+
   const [isSubmitted, setIsSubmitted] = useState(false);
 
-  const [jobData, setJobData] = useState<JobData>({
-    jobTitle: "",
-    companyName: "",
-    location: "Stockholm",
-    vehicleRequired: "Tung Lastbil / Heavy Truck (C)",
-    employmentType: "Heltid (Full-time)",
-    workingHours: "Dagtid (Day Shift)",
-    salaryType: "Fast Månadslön (Fixed Monthly SEK)",
-    salaryAmount: "",
-    startDate: "",
-    jobDescription: "",
-    requirements: "Giltigt YKB, Digitalt Förarkort",
-    requiresTKT: false,
-  });
+  const [errorMessage, setErrorMessage] = useState("");
+
+  const [publishedJobTitle, setPublishedJobTitle] = useState("");
+
+  const [publishedCompanyName, setPublishedCompanyName] = useState("");
+
+  const [jobData, setJobData] = useState<JobData>(() => createInitialJobData());
+ 
+
+  useEffect(() => {
+    if (!hr?.companyName) {
+      return;
+    }
+
+    setJobData((prev) => ({
+      ...prev,
+      companyName: hr.companyName,
+    }));
+  }, [hr?.companyName]);
+
+  /* ==========================================================
+     PROTECT PAGE
+  ========================================================== */
+
+  useEffect(() => {
+    /*
+     * If Zustand already knows that this user
+     * is authenticated but isn't HR,
+     * they cannot access Post Job.
+     */
+    if (isAuthenticated && role !== "hr") {
+      router.replace("/EmployerJobFeed");
+    }
+  }, [isAuthenticated, role, router]);
+
+  /* ==========================================================
+     UPDATE FIELD
+  ========================================================== */
 
   const updateField = <K extends keyof JobData>(
     field: K,
@@ -102,48 +186,230 @@ export default function PostDriverJob() {
       ...prev,
       [field]: value,
     }));
+
+    if (errorMessage) {
+      setErrorMessage("");
+    }
   };
 
+  /* ==========================================================
+     STEP 1 VALIDATION
+  ========================================================== */
+
   const handleNextStep = () => {
+    setErrorMessage("");
+
     if (!jobData.jobTitle.trim()) {
-      alert("Please enter a job title.");
+      setErrorMessage("Please enter a job title.");
+
       return;
     }
 
-    if (!jobData.companyName.trim()) {
-      alert("Please enter your company name.");
+    if (!hr) {
+      setErrorMessage("Employer account information could not be found.");
+
       return;
     }
 
     setStep(2);
   };
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  /* ==========================================================
+     SUBMIT JOB
+  ========================================================== */
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
+    setErrorMessage("");
+
+    /* -----------------------------
+       AUTH CHECK
+    ------------------------------ */
+
+    if (!isAuthenticated || role !== "hr" || !hr) {
+      setErrorMessage(
+        "Please login with an employer account to publish a job.",
+      );
+
+      return;
+    }
+
+    /* -----------------------------
+       VALIDATION
+    ------------------------------ */
+
+    if (!jobData.jobTitle.trim()) {
+      setErrorMessage("Please enter a job title.");
+
+      setStep(1);
+
+      return;
+    }
+
     if (!jobData.salaryAmount.trim()) {
-      alert("Please enter the offered salary.");
+      setErrorMessage("Please enter the offered salary.");
+
       return;
     }
 
     if (!jobData.jobDescription.trim()) {
-      alert("Please enter a job description.");
+      setErrorMessage("Please enter a job description.");
+
       return;
     }
 
-    console.log("Job Post Submitted:", jobData);
-    setIsSubmitted(true);
+    /* -----------------------------
+       CREATE JOB
+    ------------------------------ */
+
+    try {
+      const response = await createJobMutation.mutateAsync({
+        jobTitle: jobData.jobTitle.trim(),
+
+        /*
+         * Always use company from
+         * authenticated HR.
+         */
+        companyName: hr.companyName,
+
+        location: jobData.location,
+
+        vehicleRequired: jobData.vehicleRequired,
+
+        employmentType: jobData.employmentType,
+
+        workingHours: jobData.workingHours,
+
+        salaryType: jobData.salaryType,
+
+        salaryAmount: jobData.salaryAmount.trim(),
+
+        startDate: jobData.startDate || undefined,
+
+        jobDescription: jobData.jobDescription.trim(),
+
+        requirements: jobData.requirements.trim() || undefined,
+
+        requiresTKT: jobData.requiresTKT,
+
+        hrId: hr.id,
+      });
+
+      /*
+       * Keep success information separately.
+       * That way resetting form won't remove
+       * success screen information.
+       */
+      setPublishedJobTitle(response.job.jobTitle);
+
+      setPublishedCompanyName(response.job.companyName);
+
+      setIsSubmitted(true);
+    } catch (error: unknown) {
+      console.error("Create job error:", error);
+
+      if (axios.isAxiosError(error)) {
+        const backendMessage = error.response?.data?.error;
+
+        setErrorMessage(
+          typeof backendMessage === "string"
+            ? backendMessage
+            : "Unable to publish the job.",
+        );
+
+        return;
+      }
+
+      setErrorMessage("Something went wrong while publishing the job.");
+    }
   };
 
+  /* ==========================================================
+     POST ANOTHER JOB
+  ========================================================== */
+
+  const handlePostAnother = () => {
+    setIsSubmitted(false);
+
+    setStep(1);
+
+    setErrorMessage("");
+
+    setPublishedJobTitle("");
+
+    setPublishedCompanyName("");
+
+    setJobData(createInitialJobData(hr?.companyName || ""));
+  };
+
+  /* ==========================================================
+     NOT AUTHENTICATED
+  ========================================================== */
+
+  if (!isAuthenticated) {
+    return (
+      <main className="min-h-[calc(100vh-65px)] bg-[var(--bg)] px-4 py-8">
+        <div className="mx-auto flex min-h-[500px] max-w-xl items-center justify-center">
+          <div className="w-full rounded-[var(--radius-xl)] border border-[var(--border)] bg-[var(--surface)] p-8 text-center shadow-[var(--shadow-lg)]">
+            <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-[var(--surface-muted)] text-[var(--primary)]">
+              <ShieldCheck className="h-7 w-7" />
+            </div>
+
+            <h2 className="mt-5 text-xl font-extrabold text-[var(--text)]">
+              Employer Login Required
+            </h2>
+
+            <p className="mt-2 text-sm leading-6 text-[var(--text-muted)]">
+              Please sign in with your company account before publishing a
+              driver vacancy.
+            </p>
+
+            <button
+              type="button"
+              onClick={() => router.push("/login")}
+              className="mt-6 rounded-[var(--radius-md)] bg-[var(--primary)] px-6 py-3 text-sm font-bold text-[var(--on-primary)]"
+            >
+              Go to Login
+            </button>
+          </div>
+        </div>
+      </main>
+    );
+  }
+
+  /* ==========================================================
+     DRIVER ACCOUNT
+  ========================================================== */
+
+  if (role !== "hr" || !hr) {
+    return <main className="min-h-[calc(100vh-65px)] bg-[var(--bg)]" />;
+  }
+
+  /* ==========================================================
+     UI
+  ========================================================== */
+
   return (
-    <main className="min-h-[calc(100vh-65px)] bg-[var(--bg)] px-4 py-8 sm:px-6 lg:px-8 text-[var(--text)]">
+    <main className="min-h-[calc(100vh-65px)] bg-[var(--bg)] px-4 py-8 text-[var(--text)] sm:px-6 lg:px-8">
       <div className="mx-auto w-full max-w-3xl">
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
+          initial={{
+            opacity: 0,
+            y: 20,
+          }}
+          animate={{
+            opacity: 1,
+            y: 0,
+          }}
+          transition={{
+            duration: 0.5,
+          }}
         >
-          {/* Header */}
+          {/* =================================================
+              HEADER
+          ================================================== */}
+
           <div className="mb-6 text-center">
             <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-[var(--surface-muted)] text-[var(--primary)]">
               <Briefcase className="h-7 w-7" />
@@ -158,13 +424,28 @@ export default function PostDriverJob() {
             </p>
           </div>
 
+          {/* =================================================
+              CARD
+          ================================================== */}
+
           <div className="rounded-[var(--radius-xl)] border border-[var(--border)] bg-[var(--surface)] p-5 shadow-[var(--shadow-lg)] sm:p-8">
             {isSubmitted ? (
-              /* SUCCESS */
+              /* =============================================
+                 SUCCESS
+              ============================================== */
+
               <motion.div
-                initial={{ opacity: 0, scale: 0.96 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ duration: 0.4 }}
+                initial={{
+                  opacity: 0,
+                  scale: 0.96,
+                }}
+                animate={{
+                  opacity: 1,
+                  scale: 1,
+                }}
+                transition={{
+                  duration: 0.4,
+                }}
                 className="py-8 text-center"
               >
                 <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-[var(--success-bg)] text-[var(--success)]">
@@ -178,11 +459,11 @@ export default function PostDriverJob() {
                 <p className="mx-auto mt-3 max-w-lg text-sm leading-6 text-[var(--text-muted)]">
                   Your post for{" "}
                   <strong className="text-[var(--text)]">
-                    {jobData.jobTitle}
+                    {publishedJobTitle}
                   </strong>{" "}
                   by{" "}
                   <strong className="text-[var(--text)]">
-                    {jobData.companyName}
+                    {publishedCompanyName}
                   </strong>{" "}
                   is now live. Verified drivers matching your requirements can
                   discover your vacancy.
@@ -200,24 +481,7 @@ export default function PostDriverJob() {
 
                   <button
                     type="button"
-                    onClick={() => {
-                      setIsSubmitted(false);
-                      setStep(1);
-                      setJobData({
-                        jobTitle: "",
-                        companyName: "",
-                        location: "Stockholm",
-                        vehicleRequired: "Tung Lastbil / Heavy Truck (C)",
-                        employmentType: "Heltid (Full-time)",
-                        workingHours: "Dagtid (Day Shift)",
-                        salaryType: "Fast Månadslön (Fixed Monthly SEK)",
-                        salaryAmount: "",
-                        startDate: "",
-                        jobDescription: "",
-                        requirements: "Giltigt YKB, Digitalt Förarkort",
-                        requiresTKT: false,
-                      });
-                    }}
+                    onClick={handlePostAnother}
                     className="rounded-[var(--radius-md)] border border-[var(--border)] bg-[var(--surface)] px-6 py-3 text-sm font-bold text-[var(--text)] transition hover:bg-[var(--surface-muted)]"
                   >
                     Post Another Requirement
@@ -226,7 +490,10 @@ export default function PostDriverJob() {
               </motion.div>
             ) : (
               <>
-                {/* Progress */}
+                {/* =============================================
+                    PROGRESS
+                ============================================== */}
+
                 <div className="mb-8">
                   <div className="flex items-center justify-center gap-3">
                     <div className="flex items-center gap-2">
@@ -246,7 +513,7 @@ export default function PostDriverJob() {
                     </div>
 
                     <div
-                      className={`h-0.5 w-10 sm:w-16 transition-colors ${
+                      className={`h-0.5 w-10 transition-colors sm:w-16 ${
                         step >= 2
                           ? "bg-[var(--primary)]"
                           : "bg-[var(--border-subtle)]"
@@ -275,28 +542,74 @@ export default function PostDriverJob() {
                   </div>
                 </div>
 
+                {/* =============================================
+                    ERROR
+                ============================================== */}
+
+                <AnimatePresence>
+                  {errorMessage && (
+                    <motion.div
+                      initial={{
+                        opacity: 0,
+                        y: -6,
+                      }}
+                      animate={{
+                        opacity: 1,
+                        y: 0,
+                      }}
+                      exit={{
+                        opacity: 0,
+                        y: -6,
+                      }}
+                      className="mb-5 rounded-[var(--radius-md)] border border-red-200 bg-red-50 px-4 py-3 text-sm font-medium text-red-600"
+                    >
+                      {errorMessage}
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+
+                {/* =============================================
+                    FORM
+                ============================================== */}
+
                 <form onSubmit={handleSubmit}>
                   <AnimatePresence mode="wait">
-                    {/* STEP 1 */}
+                    {/* =========================================
+                        STEP 1
+                    ========================================== */}
+
                     {step === 1 && (
                       <motion.div
                         key="step-1"
-                        initial={{ opacity: 0, x: -20 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        exit={{ opacity: 0, x: 20 }}
-                        transition={{ duration: 0.3 }}
+                        initial={{
+                          opacity: 0,
+                          x: -20,
+                        }}
+                        animate={{
+                          opacity: 1,
+                          x: 0,
+                        }}
+                        exit={{
+                          opacity: 0,
+                          x: 20,
+                        }}
+                        transition={{
+                          duration: 0.3,
+                        }}
                         className="space-y-5"
                       >
                         <div>
                           <h2 className="text-lg font-extrabold text-[var(--text)]">
                             Role Overview
                           </h2>
+
                           <p className="mt-1 text-xs text-[var(--text-muted)]">
                             Tell drivers what position you are hiring for.
                           </p>
                         </div>
 
-                        {/* Job Title */}
+                        {/* JOB TITLE */}
+
                         <div>
                           <label className="mb-2 block text-xs font-bold text-[var(--text)]">
                             Job Title
@@ -318,7 +631,8 @@ export default function PostDriverJob() {
                           </div>
                         </div>
 
-                        {/* Company */}
+                        {/* COMPANY */}
+
                         <div>
                           <label className="mb-2 block text-xs font-bold text-[var(--text)]">
                             Company Name
@@ -329,18 +643,20 @@ export default function PostDriverJob() {
 
                             <input
                               type="text"
-                              required
-                              value={jobData.companyName}
-                              onChange={(e) =>
-                                updateField("companyName", e.target.value)
-                              }
-                              placeholder="e.g. Nordic Logistics AB"
-                              className="w-full rounded-[var(--radius-md)] border border-[var(--border)] bg-[var(--surface)] py-3 pl-10 pr-4 text-sm font-medium text-[var(--text)] outline-none transition placeholder:text-[var(--text-subtle)] focus:border-[var(--primary)] focus:ring-4 focus:ring-[var(--focus-ring)]"
+                              value={hr.companyName}
+                              readOnly
+                              className="w-full cursor-not-allowed rounded-[var(--radius-md)] border border-[var(--border)] bg-[var(--surface-muted)] py-3 pl-10 pr-4 text-sm font-medium text-[var(--text)] outline-none"
                             />
                           </div>
+
+                          <p className="mt-1.5 text-[10px] font-medium text-[var(--text-subtle)]">
+                            Company information is automatically loaded from
+                            your employer account.
+                          </p>
                         </div>
 
-                        {/* License + Location */}
+                        {/* LICENSE + LOCATION */}
+
                         <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
                           <div>
                             <label className="mb-2 block text-xs font-bold text-[var(--text)]">
@@ -387,7 +703,8 @@ export default function PostDriverJob() {
                           </div>
                         </div>
 
-                        {/* Employment + Shift */}
+                        {/* EMPLOYMENT + SHIFT */}
+
                         <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
                           <div>
                             <label className="mb-2 block text-xs font-bold text-[var(--text)]">
@@ -430,7 +747,8 @@ export default function PostDriverJob() {
                           </div>
                         </div>
 
-                        {/* TKT Option */}
+                        {/* TKT */}
+
                         <label className="flex cursor-pointer items-start gap-3 rounded-[var(--radius-lg)] border border-[var(--border)] bg-[var(--surface-subtle)] p-4 transition hover:border-[var(--border-strong)] hover:bg-[var(--surface-muted)]">
                           <input
                             type="checkbox"
@@ -454,10 +772,12 @@ export default function PostDriverJob() {
                           <ShieldCheck className="ml-auto h-5 w-5 shrink-0 text-[var(--primary-500)]" />
                         </label>
 
+                        {/* NEXT */}
+
                         <button
                           type="button"
                           onClick={handleNextStep}
-                          className="flex w-full items-center justify-center gap-2 rounded-[var(--radius-md)] bg-[var(--primary)] py-3.5 text-sm font-bold text-[var(--on-primary)] shadow-[var(--shadow-sm)] transition hover:bg-[var(--primary-hover)] active:bg-[var(--primary-active)] active:scale-[0.99]"
+                          className="flex w-full items-center justify-center gap-2 rounded-[var(--radius-md)] bg-[var(--primary)] py-3.5 text-sm font-bold text-[var(--on-primary)] shadow-[var(--shadow-sm)] transition hover:bg-[var(--primary-hover)] active:scale-[0.99] active:bg-[var(--primary-active)]"
                         >
                           Continue to Compensation
                           <ArrowRight className="h-4 w-4" />
@@ -465,14 +785,28 @@ export default function PostDriverJob() {
                       </motion.div>
                     )}
 
-                    {/* STEP 2 */}
+                    {/* =========================================
+                        STEP 2
+                    ========================================== */}
+
                     {step === 2 && (
                       <motion.div
                         key="step-2"
-                        initial={{ opacity: 0, x: 20 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        exit={{ opacity: 0, x: -20 }}
-                        transition={{ duration: 0.3 }}
+                        initial={{
+                          opacity: 0,
+                          x: 20,
+                        }}
+                        animate={{
+                          opacity: 1,
+                          x: 0,
+                        }}
+                        exit={{
+                          opacity: 0,
+                          x: -20,
+                        }}
+                        transition={{
+                          duration: 0.3,
+                        }}
                         className="space-y-5"
                       >
                         <div>
@@ -485,7 +819,8 @@ export default function PostDriverJob() {
                           </p>
                         </div>
 
-                        {/* Salary */}
+                        {/* SALARY */}
+
                         <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
                           <div>
                             <label className="mb-2 block text-xs font-bold text-[var(--text)]">
@@ -529,7 +864,8 @@ export default function PostDriverJob() {
                           </div>
                         </div>
 
-                        {/* Start Date */}
+                        {/* START DATE */}
+
                         <div>
                           <label className="mb-2 block text-xs font-bold text-[var(--text)]">
                             Target Start Date
@@ -549,7 +885,8 @@ export default function PostDriverJob() {
                           </div>
                         </div>
 
-                        {/* Requirements */}
+                        {/* REQUIREMENTS */}
+
                         <div>
                           <label className="mb-2 block text-xs font-bold text-[var(--text)]">
                             Requirements & Certifications
@@ -566,7 +903,8 @@ export default function PostDriverJob() {
                           />
                         </div>
 
-                        {/* Description */}
+                        {/* DESCRIPTION */}
+
                         <div>
                           <label className="mb-2 block text-xs font-bold text-[var(--text)]">
                             Job Description
@@ -584,12 +922,14 @@ export default function PostDriverJob() {
                           />
                         </div>
 
-                        {/* Buttons */}
+                        {/* BUTTONS */}
+
                         <div className="flex flex-col gap-3 pt-2 sm:flex-row">
                           <button
                             type="button"
+                            disabled={createJobMutation.isPending}
                             onClick={() => setStep(1)}
-                            className="flex w-full items-center justify-center gap-2 rounded-[var(--radius-md)] border border-[var(--border)] bg-[var(--surface)] py-3.5 text-sm font-bold text-[var(--text)] transition hover:bg-[var(--surface-muted)] sm:w-1/3"
+                            className="flex w-full items-center justify-center gap-2 rounded-[var(--radius-md)] border border-[var(--border)] bg-[var(--surface)] py-3.5 text-sm font-bold text-[var(--text)] transition hover:bg-[var(--surface-muted)] disabled:cursor-not-allowed disabled:opacity-60 sm:w-1/3"
                           >
                             <ArrowLeft className="h-4 w-4" />
                             Back
@@ -597,10 +937,20 @@ export default function PostDriverJob() {
 
                           <button
                             type="submit"
-                            className="flex w-full items-center justify-center gap-2 rounded-[var(--radius-md)] bg-[var(--primary)] py-3.5 text-sm font-bold text-[var(--on-primary)] shadow-[var(--shadow-sm)] transition hover:bg-[var(--primary-hover)] active:bg-[var(--primary-active)] active:scale-[0.99] sm:w-2/3"
+                            disabled={createJobMutation.isPending}
+                            className="flex w-full items-center justify-center gap-2 rounded-[var(--radius-md)] bg-[var(--primary)] py-3.5 text-sm font-bold text-[var(--on-primary)] shadow-[var(--shadow-sm)] transition hover:bg-[var(--primary-hover)] active:scale-[0.99] active:bg-[var(--primary-active)] disabled:cursor-not-allowed disabled:opacity-60 sm:w-2/3"
                           >
-                            <CheckCircle2 className="h-4 w-4" />
-                            Publish Job Post
+                            {createJobMutation.isPending ? (
+                              <>
+                                <Loader2 className="h-4 w-4 animate-spin" />
+                                Publishing...
+                              </>
+                            ) : (
+                              <>
+                                <CheckCircle2 className="h-4 w-4" />
+                                Publish Job Post
+                              </>
+                            )}
                           </button>
                         </div>
                       </motion.div>

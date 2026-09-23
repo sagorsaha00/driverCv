@@ -45,14 +45,14 @@ export default function RegisterRoleSwitcher({
 
         <button
           type="button"
-          onClick={() => onChange("employer")}
+          onClick={() => onChange("hr")}
           className={`relative flex h-11 items-center justify-center gap-2 text-sm font-medium transition-colors ${
-            role === "employer"
+            role === "hr"
               ? "text-[var(--primary)]"
               : "text-[var(--text-muted)] hover:text-[var(--text)]"
           }`}
         >
-          {role === "employer" && (
+          {role === "hr" && (
             <motion.div
               layoutId="register-role"
               className="absolute inset-0 border border-[var(--border)] bg-[var(--surface)] shadow-[var(--shadow-xs)]"

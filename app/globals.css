@@ -1,110 +1,113 @@
 @import "tailwindcss";
 
+/* ==========================================================================
+   DESIGN TOKENS & COLOR PALETTE
+   Theme: Nordic Prestige Olive & Minimalist Scandinavian Luxury
+   Optimized for high-contrast readability, depth, and responsive fluidity
+   ========================================================================== */
+
 :root {
+  /* --- Brand Primary (Swedish Prestige Olive) --- */
+  --primary-50: #F4F7EE;
+  --primary-100: #E5EED6;
+  --primary-200: #CEE0B4;
+  --primary-300: #B0CE8A;
+  --primary-400: #8EB75E;
+  --primary-500: #5D8028;  /* Refined, authoritative core olive */
+  --primary-600: #4B691F;  /* Hover state */
+  --primary-700: #3A5217;  /* Active / Pressed state */
+  --primary-800: #2C3E10;  /* Deep pine shadow */
+  --primary-900: #1D2A0A;  /* Ultra-dark forest */
+  --primary-950: #0F1604;
 
-
-  --primary-50: #F5F7EF;
-  --primary-100: #E8EDDC;
-  --primary-200: #D2DCB9;
-  --primary-300: #B5C68D;
-  --primary-400: #91A85F;
-  --primary-500: #6A8832;
-  --primary-600: #587229;
-  --primary-700: #465B22;
-  --primary-800: #37481D;
-  --primary-900: #293617;
-
-  --primary-rgb: 106, 136, 50;
-
-
-
+  --primary-rgb: 93, 128, 40;
 
   --primary: var(--primary-500);
   --primary-hover: var(--primary-600);
   --primary-active: var(--primary-700);
-
+  --primary-subtle: rgba(var(--primary-rgb), 0.08);
   --on-primary: #FFFFFF;
 
-
-
-
-  --bg: #FAFBF8;
+  /* --- Backgrounds & Surfaces (Scandinavian Alabaster) --- */
+  --bg: #F9FAF6;
   --surface: #FFFFFF;
+  --surface-raised: #FFFFFF;
+  --surface-subtle: #F3F6EE;
+  --surface-muted: #EAEFE3;
+  --surface-glass: rgba(255, 255, 255, 0.82);
 
-  --surface-muted: #F5F7EF;
+  /* --- Text & Contrast Hierarchy (WCAG AAA Compliant) --- */
+  --text: #11170E;             /* Deep crisp obsidian with botanical undertone */
+  --text-secondary: #3E4B3A;   /* Refined secondary body */
+  --text-muted: #64735E;       /* Captions & helper labels */
+  --text-subtle: #8C9B86;      /* Placeholders & subtle icons */
+  --text-inverse: #FFFFFF;
 
-  --surface-subtle: #F8FAF7;
+  /* --- Borders, Dividers & Outlines --- */
+  --border: #E1E7DA;
+  --border-subtle: #ECF1E7;
+  --border-strong: #CBD5C1;
+  --border-glass: rgba(255, 255, 255, 0.6);
 
+  /* --- Semantic Status Colors --- */
+  --success: #287A38;
+  --success-bg: #EBF7EE;
+  --success-border: #C3E6C9;
 
+  --warning: #B26A00;
+  --warning-bg: #FFF7EB;
+  --warning-border: #FCE1B6;
 
+  --danger: #C52929;
+  --danger-bg: #FDF0F0;
+  --danger-border: #F8C8C8;
 
+  --info: #22649C;
+  --info-bg: #EDF5FB;
+  --info-border: #BDE0F7;
 
-  --text: #172012;
+  /* --- Focus & Accessibility --- */
+  --focus-ring: rgba(var(--primary-rgb), 0.32);
 
-
-  --text-muted: #66705F;
-
-  --text-subtle: #8A9384;
-
-
-
-
-  --border: #E1E6DA;
-
-  --border-subtle: #EDF0E9;
-
-  --border-strong: #CBD4BF;
-
-
-
-
-  --success: #2F7D32;
-  --success-bg: #EAF5EA;
-
-  --warning: #B7791F;
-  --warning-bg: #FFF7E6;
-
-  --danger: #C24141;
-  --danger-bg: #FDECEC;
-
-  --info: #3B6EA5;
-  --info-bg: #EDF4FB;
-
-
-
-
-  --focus-ring: rgba(var(--primary-rgb), 0.28);
-
-
-
-
+  /* --- Border Radii (Modern Soft Geometry) --- */
+  --radius-xs: 4px;
   --radius-sm: 6px;
   --radius: 8px;
   --radius-md: 10px;
   --radius-lg: 14px;
   --radius-xl: 18px;
+  --radius-2xl: 24px;
+  --radius-full: 9999px;
 
+  /* --- Multi-Layer Ambient Shadows (Apple & Linear Grade) --- */
+  --shadow-xs: 0 1px 2px 0 rgba(17, 23, 14, 0.04);
+  
+  --shadow-sm: 
+    0 1px 3px 0 rgba(17, 23, 14, 0.05),
+    0 2px 6px -1px rgba(17, 23, 14, 0.03);
 
+  --shadow-md: 
+    0 4px 12px -2px rgba(17, 23, 14, 0.06),
+    0 2px 6px -1px rgba(17, 23, 14, 0.04);
 
+  --shadow-lg: 
+    0 12px 28px -4px rgba(17, 23, 14, 0.08),
+    0 4px 12px -2px rgba(17, 23, 14, 0.03);
 
-  --shadow-xs:
-    0 1px 2px rgba(23, 32, 18, 0.04);
+  --shadow-xl: 
+    0 20px 40px -8px rgba(17, 23, 14, 0.10),
+    0 8px 16px -4px rgba(17, 23, 14, 0.04);
 
-  --shadow-sm:
-    0 1px 3px rgba(23, 32, 18, 0.06),
-    0 2px 8px rgba(23, 32, 18, 0.04);
+  --shadow-2xl: 
+    0 32px 64px -12px rgba(17, 23, 14, 0.15);
 
-  --shadow-md:
-    0 4px 12px rgba(23, 32, 18, 0.07),
-    0 12px 28px rgba(23, 32, 18, 0.05);
+  --shadow-glow: 
+    0 0 28px -4px rgba(var(--primary-rgb), 0.28);
 
-  --shadow-lg:
-    0 8px 24px rgba(23, 32, 18, 0.08),
-    0 20px 50px rgba(23, 32, 18, 0.06);
+  --shadow-inner-clean: 
+    inset 0 1px 0 0 rgba(255, 255, 255, 0.8);
 
-
-
-
+  /* --- Typography --- */
   --font-sans:
     Inter,
     ui-sans-serif,
@@ -121,68 +124,217 @@
     monospace;
 }
 
+/* ==========================================================================
+   DARK MODE OVERRIDES (Obsidian Luxury Palette)
+   Activated by `.dark` class or system preference
+   ========================================================================== */
+.dark {
+  --primary-50: #101708;
+  --primary-100: #1B290E;
+  --primary-200: #293E15;
+  --primary-300: #3D5C1E;
+  --primary-400: #558028;
+  --primary-500: #6F9F35;  /* Luminous green for high contrast on dark surfaces */
+  --primary-600: #85B546;
+  --primary-700: #9FCC5C;
+  --primary-800: #BEE383;
+  --primary-900: #DCF2B2;
+  --primary-950: #F3FAEA;
 
+  --primary-rgb: 111, 159, 53;
 
+  --primary: var(--primary-500);
+  --primary-hover: var(--primary-600);
+  --primary-active: var(--primary-700);
+  --primary-subtle: rgba(var(--primary-rgb), 0.14);
+  --on-primary: #0A0F06;
+
+  --bg: #0B0F09;
+  --surface: #121810;
+  --surface-raised: #182015;
+  --surface-subtle: #1C2619;
+  --surface-muted: #243120;
+  --surface-glass: rgba(18, 24, 16, 0.82);
+
+  --text: #F3F6F0;
+  --text-secondary: #C5D1C0;
+  --text-muted: #8E9F88;
+  --text-subtle: #62725D;
+  --text-inverse: #0B0F09;
+
+  --border: #232E20;
+  --border-subtle: #192216;
+  --border-strong: #33432F;
+  --border-glass: rgba(255, 255, 255, 0.08);
+
+  --focus-ring: rgba(var(--primary-rgb), 0.45);
+
+  --shadow-xs: 0 1px 2px 0 rgba(0, 0, 0, 0.4);
+  --shadow-sm: 0 2px 4px 0 rgba(0, 0, 0, 0.35);
+  --shadow-md: 0 4px 14px -2px rgba(0, 0, 0, 0.5);
+  --shadow-lg: 0 12px 30px -4px rgba(0, 0, 0, 0.6);
+  --shadow-xl: 0 24px 48px -8px rgba(0, 0, 0, 0.75);
+  --shadow-glow: 0 0 32px -2px rgba(var(--primary-rgb), 0.32);
+}
+
+/* ==========================================================================
+   TAILWIND CSS v4 THEME CONFIGURATION
+   Exposes all design system variables to utility classes
+   ========================================================================== */
 @theme {
+  /* Colors */
+  --color-primary-50: var(--primary-50);
+  --color-primary-100: var(--primary-100);
+  --color-primary-200: var(--primary-200);
+  --color-primary-300: var(--primary-300);
+  --color-primary-400: var(--primary-400);
+  --color-primary-500: var(--primary-500);
+  --color-primary-600: var(--primary-600);
+  --color-primary-700: var(--primary-700);
+  --color-primary-800: var(--primary-800);
+  --color-primary-900: var(--primary-900);
+  --color-primary-950: var(--primary-950);
+
   --color-primary: var(--primary);
   --color-primary-hover: var(--primary-hover);
   --color-primary-active: var(--primary-active);
+  --color-primary-subtle: var(--primary-subtle);
+  --color-on-primary: var(--on-primary);
 
   --color-background: var(--bg);
+  --color-bg: var(--bg);
   --color-surface: var(--surface);
+  --color-surface-raised: var(--surface-raised);
   --color-surface-muted: var(--surface-muted);
+  --color-surface-subtle: var(--surface-subtle);
+  --color-surface-glass: var(--surface-glass);
 
   --color-text: var(--text);
+  --color-text-secondary: var(--text-secondary);
   --color-text-muted: var(--text-muted);
+  --color-text-subtle: var(--text-subtle);
+  --color-text-inverse: var(--text-inverse);
 
   --color-border: var(--border);
+  --color-border-subtle: var(--border-subtle);
+  --color-border-strong: var(--border-strong);
 
   --color-success: var(--success);
+  --color-success-bg: var(--success-bg);
   --color-warning: var(--warning);
+  --color-warning-bg: var(--warning-bg);
   --color-danger: var(--danger);
+  --color-danger-bg: var(--danger-bg);
+  --color-info: var(--info);
+  --color-info-bg: var(--info-bg);
 
+  /* Shadows */
+  --shadow-xs: var(--shadow-xs);
+  --shadow-sm: var(--shadow-sm);
+  --shadow-md: var(--shadow-md);
+  --shadow-lg: var(--shadow-lg);
+  --shadow-xl: var(--shadow-xl);
+  --shadow-2xl: var(--shadow-2xl);
+  --shadow-glow: var(--shadow-glow);
+
+  /* Border Radii */
+  --radius-xs: var(--radius-xs);
+  --radius-sm: var(--radius-sm);
+  --radius: var(--radius);
+  --radius-md: var(--radius-md);
+  --radius-lg: var(--radius-lg);
+  --radius-xl: var(--radius-xl);
+  --radius-2xl: var(--radius-2xl);
+
+  /* Fonts */
   --font-sans: var(--font-sans);
+  --font-display: var(--font-display);
   --font-mono: var(--font-mono);
 }
 
-
+/* ==========================================================================
+   BASE & RESPONSIVE ESSENTIALS
+   ========================================================================== */
 @layer base {
+  *, ::before, ::after {
+    box-sizing: border-box;
+    border-color: var(--border);
+  }
+
   html {
     scroll-behavior: smooth;
     -webkit-tap-highlight-color: transparent;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
   }
 
   body {
-    background: var(--bg);
+    background-color: var(--bg);
     color: var(--text);
     font-family: var(--font-sans);
+    min-height: 100vh;
+    overflow-x: hidden;
   }
 
   ::selection {
-    background: var(--primary);
-    color: white;
+    background-color: var(--primary);
+    color: var(--on-primary);
+  }
+
+  /* Interactive Elements Focus Ring */
+  :focus-visible {
+    outline: 2px solid var(--primary);
+    outline-offset: 2px;
   }
 }
 
+/* ==========================================================================
+   PREMIUM UTILITIES & GLASSMORPHISM
+   ========================================================================== */
+@utility glass-panel {
+  background: var(--surface-glass);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid var(--border-subtle);
+}
 
-/* =========================================
-   SCROLLBAR
-========================================= */
+@utility glass-card {
+  background: var(--surface-glass);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-sm);
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
 
+@utility luxury-card-hover {
+  transition: all 0.28s cubic-bezier(0.16, 1, 0.3, 1);
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-lg);
+    border-color: var(--border-strong);
+  }
+}
+
+/* ==========================================================================
+   MINIMAL LUXURY SCROLLBAR
+   ========================================================================== */
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;
 }
 
 ::-webkit-scrollbar-track {
-  background: #F1F3ED;
+  background: var(--surface-subtle);
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #B5C68D;
-  border-radius: 999px;
+  background: var(--border-strong);
+  border-radius: 9999px;
+  transition: background 0.2s ease;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: var(--primary);
+  background: var(--primary-400);
 }

@@ -9,6 +9,7 @@ import type {
   HRRegisterPayload,
   LoginPayload,
 } from "@/type/auth";
+import { CreateJobPayload, CreateJobResponse, DriverJob } from "@/type/job";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
 
@@ -52,4 +53,20 @@ export const loginHR = async (
   const response = await api.post<HRLoginResponse>("/api/hr/hrLogin", payload);
 
   return response.data;
+};
+
+export const createJob = async (
+  payload: CreateJobPayload,
+): Promise<CreateJobResponse> => {
+  const response = await api.post<CreateJobResponse>("/api/driverJob/createDriverJob", payload);
+
+  return response.data;
+};
+
+export const getJobs = async (): Promise<DriverJob[]> => {
+  const response = await api.get<{
+    jobs: DriverJob[];
+  }>("/api/driverJob/getAllDriverJobs");
+
+  return response.data.jobs;
 };

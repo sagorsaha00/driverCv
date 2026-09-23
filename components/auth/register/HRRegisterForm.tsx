@@ -53,7 +53,7 @@ export default function HRRegisterForm() {
       },
       {
         onSuccess: (hr: any) => {
-          useAuthStore.getState().setAuth(hr, "employer");
+          useAuthStore.getState().setAuth(hr, "hr");
 
           router.push("/ExploreDrivers");
         },

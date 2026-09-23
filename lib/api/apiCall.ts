@@ -1,8 +1,10 @@
 "use client";
 
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 
 import {
+  createJob,
+  getJobs,
   loginDriver,
   loginHR,
   registerDriver,
@@ -15,6 +17,7 @@ import {
   HRRegisterPayload,
   LoginPayload,
 } from "@/type/auth";
+import { CreateJobPayload } from "@/type/job";
 
 export const useRegisterDriver = () => {
   return useMutation({
@@ -36,5 +39,18 @@ export const useLoginDriver = () => {
 export const useLoginHR = () => {
   return useMutation<HRLoginResponse, Error, LoginPayload>({
     mutationFn: (payload) => loginHR(payload),
+  });
+};
+
+export const useCreateJob = () => {
+  return useMutation({
+    mutationFn: (payload: CreateJobPayload) => createJob(payload),
+  });
+};
+
+export const useJobs = () => {
+  return useQuery({
+    queryKey: ["jobs"],
+    queryFn: getJobs,
   });
 };

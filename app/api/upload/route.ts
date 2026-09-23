@@ -1,4 +1,4 @@
-import { v2 as cloudinary } from "cloudinary";
+import { v2 as cloudinary, type UploadApiResponse } from "cloudinary";
 import { NextResponse } from "next/server";
 
 cloudinary.config({
@@ -35,7 +35,7 @@ export async function POST(req: Request) {
 
     const buffer = Buffer.from(bytes);
 
-    const result = await new Promise<cloudinary.UploadApiResponse>(
+    const result = await new Promise<UploadApiResponse>(
       (resolve, reject) => {
         const uploadStream = cloudinary.uploader.upload_stream(
           {
