@@ -3,6 +3,8 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
 import Link from "next/link";
+import axios from "axios";
+
 import {
   Mail,
   Lock,
@@ -12,58 +14,109 @@ import {
   ShieldCheck,
   Building2,
   Car,
-  CheckCircle2,
   Loader2,
-  Search,
-  Users,
-  FileCheck2,
-  MapPin,
-  Plus,
 } from "lucide-react";
+
 import { useRouter } from "next/navigation";
+
+import { useAuthStore } from "@/store/authStore";
+
+import type { UserRole } from "@/type/auth";
+import { useLoginDriver, useLoginHR } from "@/lib/api/apiCall";
 
 export default function LoginPage() {
   const router = useRouter();
 
-  const [role, setRole] = useState<"driver" | "employer">("driver");
+  // ============================================
+  // STATE
+  // ============================================
+
+  const [role, setRole] = useState<UserRole>("driver");
+
   const [showPassword, setShowPassword] = useState(false);
-  const [loading, setLoading] = useState(false);
+
+  const [errorMsg, setErrorMsg] = useState("");
 
   const [formData, setFormData] = useState({
     email: "",
     password: "",
   });
 
-  const [errorMsg, setErrorMsg] = useState("");
+  const setAuth = useAuthStore((state) => state.setAuth);
 
-  const handleLogin = async (e: React.FormEvent) => {
+  const driverLogin = useLoginDriver();
+  const hrLogin = useLoginHR();
+
+  const isLoggingIn = driverLogin.isPending || hrLogin.isPending;
+
+  const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     setErrorMsg("");
 
-    if (!formData.email || !formData.password) {
+    const email = formData.email.trim();
+    const password = formData.password;
+
+    if (!email || !password) {
       setErrorMsg("Please enter both your email address and password.");
+
       return;
     }
 
-    setLoading(true);
-
-    setTimeout(() => {
-      setLoading(false);
+    try {
+      const payload = {
+        email,
+        password,
+      };
 
       if (role === "driver") {
-        router.push("/EmployerJobFeed");
-      } else {
-        router.push("/ExploreDrivers");
+        const response = await driverLogin.mutateAsync(payload);
+
+        setAuth(response.driver, "driver");
+
+        router.replace("/EmployerJobFeed");
+
+        return;
       }
-    }, 700);
+
+      const response = await hrLogin.mutateAsync(payload);
+
+      setAuth(response.hr, "hr");
+
+      router.replace("/ExploreDrivers");
+    } catch (error: unknown) {
+      console.error("Login error:", error);
+
+      if (axios.isAxiosError(error)) {
+        const message = error.response?.data?.error;
+
+        setErrorMsg(
+          typeof message === "string" ? message : "Invalid email or password.",
+        );
+
+        return;
+      }
+
+      setErrorMsg("Something went wrong. Please try again.");
+    }
+  };
+
+  const handleRoleChange = (newRole: UserRole) => {
+    if (isLoggingIn) return;
+
+    setRole(newRole);
+
+    setErrorMsg("");
+
+    setFormData((prev) => ({
+      ...prev,
+      password: "",
+    }));
   };
 
   return (
-    <main className="  bg-[#FAFBF8]">
+    <main className="bg-[#FAFBF8]">
       <div className="flex min-h-[calc(100vh-68px)]">
-         
-
         <section
           className="
             flex
@@ -91,9 +144,9 @@ export default function LoginPage() {
             }}
             className="w-full max-w-md"
           >
-            {/* =================================================
+            {/* =====================================
                 LOGIN CARD
-            ================================================== */}
+            ====================================== */}
 
             <div
               className="
@@ -106,7 +159,10 @@ export default function LoginPage() {
                 sm:p-8
               "
             >
-              {/* Header */}
+              {/* ===================================
+                  HEADER
+              ==================================== */}
+
               <div className="text-center">
                 <div
                   className="
@@ -150,9 +206,9 @@ export default function LoginPage() {
                 </p>
               </div>
 
-              {/* =================================================
+              {/* ===================================
                   ROLE SWITCHER
-              ================================================== */}
+              ==================================== */}
 
               <div
                 className="
@@ -169,28 +225,24 @@ export default function LoginPage() {
               >
                 <RoleButton
                   active={role === "driver"}
-                  onClick={() => {
-                    setRole("driver");
-                    setErrorMsg("");
-                  }}
+                  disabled={isLoggingIn}
+                  onClick={() => handleRoleChange("driver")}
                   icon={Car}
                   label="Driver"
                 />
 
                 <RoleButton
-                  active={role === "employer"}
-                  onClick={() => {
-                    setRole("employer");
-                    setErrorMsg("");
-                  }}
+                  active={role === "hr"}
+                  disabled={isLoggingIn}
+                  onClick={() => handleRoleChange("hr")}
                   icon={Building2}
                   label="Company / Fleet"
                 />
               </div>
 
-              {/* =================================================
+              {/* ===================================
                   ERROR
-              ================================================== */}
+              ==================================== */}
 
               {errorMsg && (
                 <motion.div
@@ -218,14 +270,16 @@ export default function LoginPage() {
                 </motion.div>
               )}
 
-              {/* =================================================
-                  FORM
-              ================================================== */}
+              {/* ===================================
+                  LOGIN FORM
+              ==================================== */}
 
               <form onSubmit={handleLogin} className="mt-6 space-y-4">
-                {/* Email */}
+                {/* EMAIL */}
+
                 <div>
                   <label
+                    htmlFor="email"
                     className="
                       mb-1.5
                       block
@@ -239,20 +293,28 @@ export default function LoginPage() {
 
                   <div className="relative">
                     <input
+                      id="email"
+                      name="email"
                       type="email"
+                      autoComplete="email"
                       required
+                      disabled={isLoggingIn}
                       placeholder={
                         role === "driver"
                           ? "driver@example.com"
                           : "fleet.manager@company.se"
                       }
                       value={formData.email}
-                      onChange={(e) =>
-                        setFormData({
-                          ...formData,
+                      onChange={(e) => {
+                        setFormData((prev) => ({
+                          ...prev,
                           email: e.target.value,
-                        })
-                      }
+                        }));
+
+                        if (errorMsg) {
+                          setErrorMsg("");
+                        }
+                      }}
                       className="
                         h-11
                         w-full
@@ -272,6 +334,8 @@ export default function LoginPage() {
                         focus:border-[#6A8832]
                         focus:ring-2
                         focus:ring-[rgba(106,136,50,0.14)]
+                        disabled:cursor-not-allowed
+                        disabled:opacity-60
                       "
                     />
 
@@ -290,10 +354,19 @@ export default function LoginPage() {
                   </div>
                 </div>
 
-                {/* Password */}
+                {/* PASSWORD */}
+
                 <div>
-                  <div className="mb-1.5 flex items-center justify-between">
+                  <div
+                    className="
+                      mb-1.5
+                      flex
+                      items-center
+                      justify-between
+                    "
+                  >
                     <label
+                      htmlFor="password"
                       className="
                         text-xs
                         font-bold
@@ -305,11 +378,12 @@ export default function LoginPage() {
 
                     <button
                       type="button"
-                      onClick={() =>
+                      disabled={isLoggingIn}
+                      onClick={() => {
                         alert(
                           "Password reset instructions will be dispatched to your registered email.",
-                        )
-                      }
+                        );
+                      }}
                       className="
                         cursor-pointer
                         text-[11px]
@@ -317,6 +391,8 @@ export default function LoginPage() {
                         text-[#6A8832]
                         transition-colors
                         hover:text-[#587229]
+                        disabled:cursor-not-allowed
+                        disabled:opacity-50
                       "
                     >
                       Forgot password?
@@ -325,16 +401,24 @@ export default function LoginPage() {
 
                   <div className="relative">
                     <input
+                      id="password"
+                      name="password"
                       type={showPassword ? "text" : "password"}
+                      autoComplete="current-password"
                       required
+                      disabled={isLoggingIn}
                       placeholder="••••••••••••"
                       value={formData.password}
-                      onChange={(e) =>
-                        setFormData({
-                          ...formData,
+                      onChange={(e) => {
+                        setFormData((prev) => ({
+                          ...prev,
                           password: e.target.value,
-                        })
-                      }
+                        }));
+
+                        if (errorMsg) {
+                          setErrorMsg("");
+                        }
+                      }}
                       className="
                         h-11
                         w-full
@@ -354,6 +438,8 @@ export default function LoginPage() {
                         focus:border-[#6A8832]
                         focus:ring-2
                         focus:ring-[rgba(106,136,50,0.14)]
+                        disabled:cursor-not-allowed
+                        disabled:opacity-60
                       "
                     />
 
@@ -372,6 +458,7 @@ export default function LoginPage() {
 
                     <button
                       type="button"
+                      disabled={isLoggingIn}
                       onClick={() => setShowPassword((prev) => !prev)}
                       aria-label={
                         showPassword ? "Hide password" : "Show password"
@@ -385,6 +472,8 @@ export default function LoginPage() {
                         text-[#8A9384]
                         transition-colors
                         hover:text-[#6A8832]
+                        disabled:cursor-not-allowed
+                        disabled:opacity-50
                       "
                     >
                       {showPassword ? (
@@ -396,13 +485,20 @@ export default function LoginPage() {
                   </div>
                 </div>
 
-                {/* Submit */}
+                {/* =================================
+                    SUBMIT
+                ================================== */}
+
                 <motion.button
                   type="submit"
-                  disabled={loading}
-                  whileTap={{
-                    scale: 0.99,
-                  }}
+                  disabled={isLoggingIn}
+                  whileTap={
+                    isLoggingIn
+                      ? undefined
+                      : {
+                          scale: 0.99,
+                        }
+                  }
                   className="
                     mt-2
                     flex
@@ -425,7 +521,7 @@ export default function LoginPage() {
                     disabled:opacity-70
                   "
                 >
-                  {loading ? (
+                  {isLoggingIn ? (
                     <>
                       <Loader2 className="h-4 w-4 animate-spin" />
 
@@ -443,9 +539,9 @@ export default function LoginPage() {
                 </motion.button>
               </form>
 
-              {/* =================================================
+              {/* ===================================
                   REGISTER
-              ================================================== */}
+              ==================================== */}
 
               <div
                 className="
@@ -475,7 +571,8 @@ export default function LoginPage() {
               </div>
             </div>
 
-            {/* Security note */}
+            {/* SECURITY */}
+
             <div
               className="
                 mt-4
@@ -498,111 +595,15 @@ export default function LoginPage() {
   );
 }
 
-/* ============================================================
-   FEATURE ITEM
-============================================================ */
-
-function FeatureItem({
-  icon: Icon,
-  title,
-  description,
-}: {
-  icon: React.ElementType;
-  title: string;
-  description: string;
-}) {
-  return (
-    <div className="flex items-center gap-3">
-      <div
-        className="
-          flex
-          h-8
-          w-8
-          shrink-0
-          items-center
-          justify-center
-          rounded-[8px]
-          border
-          border-[#465B22]
-          bg-[#293617]
-          text-[#91A85F]
-        "
-      >
-        <Icon className="h-4 w-4" />
-      </div>
-
-      <div>
-        <p
-          className="
-            text-xs
-            font-bold
-            text-[#E8EDDC]
-          "
-        >
-          {title}
-        </p>
-
-        <p
-          className="
-            mt-0.5
-            text-[10px]
-            leading-4
-            text-[#8A9384]
-          "
-        >
-          {description}
-        </p>
-      </div>
-    </div>
-  );
-}
-
-/* ============================================================
-   STAT
-============================================================ */
-
-function Stat({ value, label }: { value: string; label: string }) {
-  return (
-    <div className="px-4 first:pl-0 last:pr-0">
-      <p
-        className="
-          font-display
-          text-xl
-          font-black
-          tracking-tight
-          text-white
-        "
-      >
-        {value}
-      </p>
-
-      <p
-        className="
-          mt-1
-          text-[9px]
-          font-semibold
-          uppercase
-          tracking-[0.1em]
-          text-[#8A9384]
-        "
-      >
-        {label}
-      </p>
-    </div>
-  );
-}
-
-/* ============================================================
-   ROLE BUTTON
-============================================================ */
-
 function RoleButton({
   active,
+  disabled,
   onClick,
   icon: Icon,
   label,
 }: {
   active: boolean;
+  disabled?: boolean;
   onClick: () => void;
   icon: React.ElementType;
   label: string;
@@ -610,6 +611,7 @@ function RoleButton({
   return (
     <button
       type="button"
+      disabled={disabled}
       onClick={onClick}
       className={`
         flex
@@ -622,11 +624,15 @@ function RoleButton({
         text-xs
         font-bold
         transition-all
+
         ${
           active
             ? "bg-[#6A8832] text-white shadow-sm"
             : "text-[#66705F] hover:bg-white hover:text-[#172012]"
         }
+
+        disabled:cursor-not-allowed
+        disabled:opacity-60
       `}
     >
       <Icon className="h-3.5 w-3.5" />
