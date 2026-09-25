@@ -9,6 +9,7 @@ import {
   Car,
   ChevronDown,
   ChevronRight,
+  LayoutDashboard,
   LogIn,
   LogOut,
   Menu,
@@ -103,6 +104,15 @@ export default function Navbar() {
       name: "Driving Jobs",
       href: "/EmployerJobFeed",
       icon: Briefcase,
+    });
+  }
+
+  // Dashboard for logged in users
+  if (isAuthenticated) {
+    navLinks.push({
+      name: "Dashboard",
+      href: "/dashboard",
+      icon: LayoutDashboard,
     });
   }
 
@@ -592,8 +602,35 @@ export default function Navbar() {
                       </div>
                     </div>
 
-                    {/* Logout */}
+                    {/* Menu links */}
+                    <div className="border-t border-border-subtle p-1.5 space-y-1">
+                      <Link
+                        href="/dashboard"
+                        onClick={() => setProfileOpen(false)}
+                        className="
+                          flex
+                          w-full
+                          cursor-pointer
+                          items-center
+                          gap-2.5
+                          rounded-[8px]
+                          px-3
+                          py-2
+                          text-left
+                          text-[12px]
+                          font-semibold
+                          text-text
+                          no-underline
+                          transition-colors duration-200
+                          hover:bg-surface-muted
+                        "
+                      >
+                        <LayoutDashboard className="h-4 w-4 text-primary" />
+                        Go to Dashboard
+                      </Link>
+                    </div>
 
+                    {/* Logout */}
                     <div
                       className="
                         border-t border-border-subtle

@@ -6,9 +6,17 @@ interface Props {
   value: string;
   onChange: (value: string) => void;
   inputRef?: React.RefObject<HTMLInputElement | null>;
+  placeholder?: string;
+  label?: string;
 }
 
-export default function SearchInput({ value, onChange, inputRef }: Props) {
+export default function SearchInput({
+  value,
+  onChange,
+  inputRef,
+  placeholder = "Truck, delivery, CE driver...",
+  label = "Job Title or Driver",
+}: Props) {
   return (
     <div
       className="
@@ -43,7 +51,7 @@ export default function SearchInput({ value, onChange, inputRef }: Props) {
             text-[var(--text-muted)]
           "
         >
-          Job Title or Driver
+          {label}
         </label>
 
         <div className="flex items-center">
@@ -52,7 +60,7 @@ export default function SearchInput({ value, onChange, inputRef }: Props) {
             type="text"
             value={value}
             onChange={(e) => onChange(e.target.value)}
-            placeholder="Truck, delivery, CE driver..."
+            placeholder={placeholder}
             className="
               w-full
               border-none

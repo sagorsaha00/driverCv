@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import {
   ArrowLeft,
@@ -24,6 +24,7 @@ import {
 import { motion, AnimatePresence } from "framer-motion";
 
 import { useSingleDriver } from "@/lib/hook/useDrivers";
+import { useAuthStore } from "@/store/authStore";
 import HireDriverModal from "@/components/drivers/HireDriverModal";
 import MessageDriverModal from "@/components/drivers/MessageDriverModal";
 
@@ -32,9 +33,27 @@ export default function DriverProfileView() {
   const params = useParams();
   const driverId = params?.id as string;
 
+  const [mounted, setMounted] = useState(false);
   const [copied, setCopied] = useState(false);
   const [showHireModal, setShowHireModal] = useState(false);
   const [showMessageModal, setShowMessageModal] = useState(false);
+
+  // Authenticated role check
+  const authRole = useAuthStore(
+    (state) => state.role || (state.user as any)?.role?.toLowerCase()
+  );
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  const isDriver = mounted && authRole === "driver";
+
+  useEffect(() => {
+    if (isDriver) {
+      router.replace("/EmployerJobFeed");
+    }
+  }, [isDriver, router]);
 
   // Live dynamic fetch from http://localhost:5000/api/driver/driverSingleData/:id
   const {
@@ -59,6 +78,30 @@ export default function DriverProfileView() {
     if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase();
     return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
   };
+
+  // If authenticated user is a driver, prevent seeing or hiring another driver
+  if (isDriver) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-[var(--bg)] px-4 py-16 text-center">
+        <div className="max-w-md rounded-3xl border border-[var(--border)] bg-[var(--surface)] p-8 shadow-xs">
+          <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-primary/10 text-primary">
+            <Briefcase className="h-7 w-7" />
+          </div>
+          <h2 className="mt-4 text-base font-bold text-[var(--text)]">Driver Portal Active</h2>
+          <p className="mt-2 text-xs text-[var(--text-muted)]">
+            Drivers cannot view or hire other drivers. Redirecting you to driving job opportunities...
+          </p>
+          <button
+            type="button"
+            onClick={() => router.push("/EmployerJobFeed")}
+            className="mt-6 inline-flex cursor-pointer items-center justify-center gap-2 rounded-xl bg-primary px-5 py-2.5 text-xs font-bold text-white shadow-xs transition hover:bg-primary-hover"
+          >
+            Go to Driving Jobs
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   // LOADING STATE
   if (isLoading) {

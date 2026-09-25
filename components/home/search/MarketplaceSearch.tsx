@@ -16,6 +16,7 @@ import {
   useLocations,
   useMarketplaceSearch,
 } from "@/lib/hook/useMarketplaceSearch";
+import { useAuthStore } from "@/store/authStore";
 
 export default function MarketplaceSearch() {
   const [open, setOpen] = useState(false);
@@ -25,6 +26,18 @@ export default function MarketplaceSearch() {
   const [selectedLocation, setSelectedLocation] = useState("");
 
   const [selectedPosted, setSelectedPosted] = useState<PostedFilter>("");
+
+  const [mounted, setMounted] = useState(false);
+
+  const authRole = useAuthStore(
+    (state) => state.role || (state.user as any)?.role?.toLowerCase()
+  );
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  const isDriver = mounted && authRole === "driver";
 
   const modalRef = useRef<HTMLDivElement>(null);
 
@@ -53,19 +66,27 @@ export default function MarketplaceSearch() {
     q: debouncedQuery,
     location: selectedLocation,
     posted: selectedPosted,
-    type: "all",
+    type: isDriver ? "jobs" : "all",
     enabled: open,
   });
 
-  const drivers = data?.data.drivers ?? [];
+  const drivers = isDriver ? [] : (data?.data.drivers ?? []);
 
   const jobs = data?.data.jobs ?? [];
 
-  const counts = data?.data.counts ?? {
+  const rawCounts = data?.data.counts ?? {
     drivers: 0,
     jobs: 0,
     total: 0,
   };
+
+  const counts = isDriver
+    ? {
+        drivers: 0,
+        jobs: rawCounts.jobs,
+        total: rawCounts.jobs,
+      }
+    : rawCounts;
 
   // ============================================================
   // AUTO FOCUS
@@ -154,7 +175,7 @@ export default function MarketplaceSearch() {
                 text-[var(--text-muted)]
               "
             >
-              Search Marketplace
+              {isDriver ? "Search Driving Jobs" : "Search Marketplace"}
             </p>
 
             <p
@@ -164,7 +185,10 @@ export default function MarketplaceSearch() {
                 text-[var(--text)]
               "
             >
-              {query || "Truck, delivery, bus..."}
+              {query ||
+                (isDriver
+                  ? "Search truck, delivery, bus jobs..."
+                  : "Truck, delivery, bus...")}
             </p>
           </div>
         </div>
@@ -329,7 +353,7 @@ export default function MarketplaceSearch() {
                       text-[var(--text)]
                     "
                   >
-                    Search Marketplace
+                    {isDriver ? "Search Driving Jobs" : "Search Marketplace"}
                   </p>
 
                   <p
@@ -339,7 +363,9 @@ export default function MarketplaceSearch() {
                       text-[var(--text-muted)]
                     "
                   >
-                    Find drivers and driving jobs
+                    {isDriver
+                      ? "Find driving opportunities from verified employers"
+                      : "Find drivers and driving jobs"}
                   </p>
                 </div>
 
@@ -375,6 +401,12 @@ export default function MarketplaceSearch() {
                   value={query}
                   onChange={setQuery}
                   inputRef={inputRef}
+                  label={isDriver ? "Driving Job Title" : "Job Title or Driver"}
+                  placeholder={
+                    isDriver
+                      ? "Truck, delivery, bus driver jobs..."
+                      : "Truck, delivery, CE driver..."
+                  }
                 />
 
                 <div
@@ -456,6 +488,7 @@ export default function MarketplaceSearch() {
                   jobs={jobs}
                   counts={counts}
                   loading={isLoading}
+                  isDriver={isDriver}
                 />
               )}
             </motion.div>

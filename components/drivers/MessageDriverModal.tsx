@@ -4,6 +4,8 @@ import { useState } from "react";
 import { motion } from "framer-motion";
 import { CheckCircle2, Mail, MessageSquare, PhoneCall, Send, X } from "lucide-react";
 import { Driver } from "@/type/driver";
+import { useAuthStore } from "@/store/authStore";
+import { useSendMessage } from "@/lib/hook/useDashboard";
 
 type MessageDriverModalProps = {
   driver: Driver;
@@ -18,6 +20,9 @@ export default function MessageDriverModal({
   const [message, setMessage] = useState("");
   const [sending, setSending] = useState(false);
   const [sent, setSent] = useState(false);
+
+  const { user } = useAuthStore();
+  const sendMessageMutation = useSendMessage();
 
   const firstName = driver.fullname ? driver.fullname.split(" ")[0] : "Driver";
   const initials = driver.fullname
@@ -35,7 +40,33 @@ export default function MessageDriverModal({
     setSending(true);
 
     try {
-      await new Promise((resolve) => setTimeout(resolve, 700));
+      const senderHrId = user && "id" in user ? Number((user as any).id) : undefined;
+      const senderName =
+        user && "name" in user
+          ? String((user as any).name)
+          : user && "companyName" in user
+          ? String((user as any).companyName)
+          : "Fleet Recruiter";
+      const senderCompany =
+        user && "companyName" in user
+          ? String((user as any).companyName)
+          : "Fleet Operations";
+      const senderPhone =
+        user && "phoneNumber" in user ? String((user as any).phoneNumber) : undefined;
+      const senderEmail =
+        user && "email" in user ? String((user as any).email) : undefined;
+
+      await sendMessageMutation.mutateAsync({
+        senderHrId,
+        senderName,
+        senderCompany,
+        senderPhone,
+        senderEmail,
+        receiverDriverId: Number(driver.id),
+        subject: subject.trim() || `Inquiry for ${driver.fullname}`,
+        content: message.trim(),
+      });
+
       setSent(true);
       setTimeout(() => {
         onClose();

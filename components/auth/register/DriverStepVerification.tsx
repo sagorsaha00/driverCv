@@ -1,8 +1,13 @@
 "use client";
 
-import { ArrowLeft, Check, FileText, ShieldCheck } from "lucide-react";
+import { ArrowLeft, Check, CheckCircle2, FileText, ShieldCheck, AlertCircle } from "lucide-react";
+import { useState } from "react";
 
 import type { DriverFormData } from "./DriverStepBasic";
+import {
+  isValidSwedishPersonnummer,
+  isValidDrivingLicenseNumber,
+} from "@/lib/utils/validation";
 
 interface Props {
   data: DriverFormData;
@@ -25,8 +30,13 @@ export default function DriverStepVerification({
   onSubmit,
   loading,
 }: Props) {
-  const canSubmit =
-    data.personalIdentityNumber.trim() && data.drivingLicenseNumber.trim();
+  const [pinTouched, setPinTouched] = useState(false);
+  const [licTouched, setLicTouched] = useState(false);
+
+  const isPinValid = isValidSwedishPersonnummer(data.personalIdentityNumber);
+  const isLicValid = isValidDrivingLicenseNumber(data.drivingLicenseNumber);
+
+  const canSubmit = isPinValid && isLicValid;
 
   return (
     <div className="space-y-7">
@@ -50,40 +60,87 @@ export default function DriverStepVerification({
           </p>
 
           <p className="mt-1 text-xs leading-5 text-[var(--text-muted)]">
-            Only provide information required by your registration process.
-            Sensitive documents should not be uploaded to a public profile.
+            Swedish civic registration numbers are securely encrypted and verified according to Swedish labor standards.
           </p>
         </div>
       </div>
 
       <div className="grid gap-5 sm:grid-cols-2">
-        <label>
-          <span className="mb-2 block text-sm font-medium text-[var(--text)]">
-            Personal identity number
-          </span>
+        <div>
+          <label className="block">
+            <span className="mb-2 block text-sm font-medium text-[var(--text)]">
+              Personal identity number (Personnummer) *
+            </span>
 
-          <input
-            type="text"
-            value={data.personalIdentityNumber}
-            onChange={(e) => setData("personalIdentityNumber", e.target.value)}
-            placeholder="YYYYMMDD-XXXX"
-            className={inputClass}
-          />
-        </label>
+            <input
+              type="text"
+              value={data.personalIdentityNumber}
+              onBlur={() => setPinTouched(true)}
+              onChange={(e) => {
+                setData("personalIdentityNumber", e.target.value);
+                setPinTouched(true);
+              }}
+              placeholder="YYYYMMDD-XXXX or YYMMDD-XXXX"
+              className={`${inputClass} ${
+                pinTouched && !isPinValid
+                  ? "border-red-400 focus:border-red-500"
+                  : isPinValid
+                  ? "border-green-500 focus:border-green-600"
+                  : ""
+              }`}
+            />
+          </label>
+          {pinTouched && !isPinValid && (
+            <p className="mt-1.5 flex items-center gap-1 text-[11px] font-medium text-red-600">
+              <AlertCircle className="h-3 w-3 shrink-0" />
+              Must be a valid Swedish Personnummer (e.g. 19900101-1234)
+            </p>
+          )}
+          {data.personalIdentityNumber && isPinValid && (
+            <p className="mt-1.5 flex items-center gap-1 text-[11px] font-medium text-emerald-600">
+              <CheckCircle2 className="h-3 w-3 shrink-0" />
+              Valid Swedish Personnummer
+            </p>
+          )}
+        </div>
 
-        <label>
-          <span className="mb-2 block text-sm font-medium text-[var(--text)]">
-            Driving license number
-          </span>
+        <div>
+          <label className="block">
+            <span className="mb-2 block text-sm font-medium text-[var(--text)]">
+              Driving license number *
+            </span>
 
-          <input
-            type="text"
-            value={data.drivingLicenseNumber}
-            onChange={(e) => setData("drivingLicenseNumber", e.target.value)}
-            placeholder="License number"
-            className={inputClass}
-          />
-        </label>
+            <input
+              type="text"
+              value={data.drivingLicenseNumber}
+              onBlur={() => setLicTouched(true)}
+              onChange={(e) => {
+                setData("drivingLicenseNumber", e.target.value);
+                setLicTouched(true);
+              }}
+              placeholder="e.g. DL-12345678"
+              className={`${inputClass} ${
+                licTouched && !isLicValid
+                  ? "border-red-400 focus:border-red-500"
+                  : isLicValid
+                  ? "border-green-500 focus:border-green-600"
+                  : ""
+              }`}
+            />
+          </label>
+          {licTouched && !isLicValid && (
+            <p className="mt-1.5 flex items-center gap-1 text-[11px] font-medium text-red-600">
+              <AlertCircle className="h-3 w-3 shrink-0" />
+              Please enter a valid license number (min 6 characters)
+            </p>
+          )}
+          {data.drivingLicenseNumber && isLicValid && (
+            <p className="mt-1.5 flex items-center gap-1 text-[11px] font-medium text-emerald-600">
+              <CheckCircle2 className="h-3 w-3 shrink-0" />
+              Valid license format
+            </p>
+          )}
+        </div>
       </div>
 
       <section className="border border-[var(--border)] bg-[var(--surface)] p-5">

@@ -5,11 +5,15 @@ export type HRTab =
   | "candidates"
   | "compliance"
   | "postings"
+  | "messages"
   | "shifts";
 
 export type DriverTab =
   | "overview"
   | "jobs"
+  | "messages"
+  | "notifications"
+  | "editProfile"
   | "applications"
   | "credentials"
   | "earnings";

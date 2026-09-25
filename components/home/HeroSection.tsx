@@ -1,6 +1,23 @@
+"use client";
+
+import { useEffect, useState } from "react";
+import { Briefcase, ShieldCheck } from "lucide-react";
 import MarketplaceSearch from "./search/MarketplaceSearch";
+import { useAuthStore } from "@/store/authStore";
 
 export default function HeroSection() {
+  const [mounted, setMounted] = useState(false);
+
+  const authRole = useAuthStore(
+    (state) => state.role || (state.user as any)?.role?.toLowerCase()
+  );
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  const isDriver = mounted && authRole === "driver";
+
   return (
     <section
       className="
@@ -72,7 +89,17 @@ export default function HeroSection() {
                 text-[var(--text)]
               "
             >
-              Verified Driver Marketplace
+              {isDriver ? (
+                <>
+                  <Briefcase className="h-3.5 w-3.5 text-[var(--primary)]" />
+                  <span>Verified Driving Jobs</span>
+                </>
+              ) : (
+                <>
+                  <ShieldCheck className="h-3.5 w-3.5 text-[var(--primary)]" />
+                  <span>Verified Driver Marketplace</span>
+                </>
+              )}
             </div>
 
             <h1
@@ -86,15 +113,23 @@ export default function HeroSection() {
                 xl:text-6xl
               "
             >
-              Hire Trusted Drivers.
-              <br />
-              <span
-                className="
-                  text-[var(--primary)]
-                "
-              >
-                Verified, Fast, Reliable.
-              </span>
+              {isDriver ? (
+                <>
+                  Find Driving Jobs.
+                  <br />
+                  <span className="text-[var(--primary)]">
+                    Fast, Verified, High-Paying.
+                  </span>
+                </>
+              ) : (
+                <>
+                  Hire Trusted Drivers.
+                  <br />
+                  <span className="text-[var(--primary)]">
+                    Verified, Fast, Reliable.
+                  </span>
+                </>
+              )}
             </h1>
 
             <p
@@ -108,8 +143,9 @@ export default function HeroSection() {
                 lg:mx-0
               "
             >
-              Connect directly with professional drivers and discover driving
-              opportunities across Sweden.
+              {isDriver
+                ? "Connect directly with top fleet employers and discover high-paying driving opportunities across Sweden."
+                : "Connect directly with professional drivers and discover driving opportunities across Sweden."}
             </p>
           </div>
 

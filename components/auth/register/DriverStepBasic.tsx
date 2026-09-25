@@ -1,9 +1,19 @@
 "use client";
 
-import { ArrowRight, Eye, EyeOff, Mail, Phone, UserRound } from "lucide-react";
+import {
+  ArrowRight,
+  CheckCircle2,
+  Eye,
+  EyeOff,
+  Mail,
+  Phone,
+  UserRound,
+  AlertCircle,
+} from "lucide-react";
 import { useState } from "react";
 
 import DriverImageUpload from "./DriverImageUpload";
+import { isValidEmail, isValidSwedishPhone } from "@/lib/utils/validation";
 
 export interface DriverFormData {
   fullname: string;
@@ -66,11 +76,16 @@ export default function DriverStepBasic({
   onNext,
 }: DriverStepBasicProps) {
   const [showPassword, setShowPassword] = useState(false);
+  const [phoneTouched, setPhoneTouched] = useState(false);
+  const [emailTouched, setEmailTouched] = useState(false);
+
+  const isPhoneValid = isValidSwedishPhone(data.phonenumber);
+  const isEmailValid = isValidEmail(data.email);
 
   const canContinue =
-    data.fullname.trim() &&
-    data.email.trim() &&
-    data.phonenumber.trim() &&
+    data.fullname.trim().length >= 2 &&
+    isEmailValid &&
+    isPhoneValid &&
     data.password.length >= 8;
 
   return (
@@ -118,33 +133,81 @@ export default function DriverStepBasic({
           />
         </Field>
 
-        <Field
-          label="Phone number"
-          required
-          icon={<Phone className="h-4 w-4 text-[var(--text-subtle)]" />}
-        >
-          <input
-            type="tel"
-            value={data.phonenumber}
-            onChange={(e) => setData("phonenumber", e.target.value)}
-            placeholder="+46 70 123 45 67"
-            className={inputClass}
-          />
-        </Field>
+        <div>
+          <Field
+            label="Phone number (Sweden)"
+            required
+            icon={<Phone className="h-4 w-4 text-[var(--text-subtle)]" />}
+          >
+            <input
+              type="tel"
+              value={data.phonenumber}
+              onBlur={() => setPhoneTouched(true)}
+              onChange={(e) => {
+                setData("phonenumber", e.target.value);
+                setPhoneTouched(true);
+              }}
+              placeholder="+46 70 123 45 67 or 070 123 45 67"
+              className={`${inputClass} ${
+                phoneTouched && !isPhoneValid
+                  ? "border-red-400 focus:border-red-500"
+                  : isPhoneValid
+                  ? "border-green-500 focus:border-green-600"
+                  : ""
+              }`}
+            />
+          </Field>
+          {phoneTouched && !isPhoneValid && (
+            <p className="mt-1.5 flex items-center gap-1 text-[11px] font-medium text-red-600">
+              <AlertCircle className="h-3 w-3 shrink-0" />
+              Must be a valid Swedish phone number (+46 7X... or 07X...)
+            </p>
+          )}
+          {data.phonenumber && isPhoneValid && (
+            <p className="mt-1.5 flex items-center gap-1 text-[11px] font-medium text-emerald-600">
+              <CheckCircle2 className="h-3 w-3 shrink-0" />
+              Valid Swedish phone format
+            </p>
+          )}
+        </div>
 
-        <Field
-          label="Email address"
-          required
-          icon={<Mail className="h-4 w-4 text-[var(--text-subtle)]" />}
-        >
-          <input
-            type="email"
-            value={data.email}
-            onChange={(e) => setData("email", e.target.value)}
-            placeholder="you@example.com"
-            className={inputClass}
-          />
-        </Field>
+        <div>
+          <Field
+            label="Email address"
+            required
+            icon={<Mail className="h-4 w-4 text-[var(--text-subtle)]" />}
+          >
+            <input
+              type="email"
+              value={data.email}
+              onBlur={() => setEmailTouched(true)}
+              onChange={(e) => {
+                setData("email", e.target.value);
+                setEmailTouched(true);
+              }}
+              placeholder="driver@gmail.com"
+              className={`${inputClass} ${
+                emailTouched && !isEmailValid
+                  ? "border-red-400 focus:border-red-500"
+                  : isEmailValid
+                  ? "border-green-500 focus:border-green-600"
+                  : ""
+              }`}
+            />
+          </Field>
+          {emailTouched && !isEmailValid && (
+            <p className="mt-1.5 flex items-center gap-1 text-[11px] font-medium text-red-600">
+              <AlertCircle className="h-3 w-3 shrink-0" />
+              Please enter a valid email address (e.g. driver@gmail.com)
+            </p>
+          )}
+          {data.email && isEmailValid && (
+            <p className="mt-1.5 flex items-center gap-1 text-[11px] font-medium text-emerald-600">
+              <CheckCircle2 className="h-3 w-3 shrink-0" />
+              Valid email format
+            </p>
+          )}
+        </div>
 
         <Field label="Password" required>
           <div className="relative">

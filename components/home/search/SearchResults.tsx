@@ -18,6 +18,7 @@ interface Props {
   jobs: JobSearchResult[];
   counts: SearchCounts;
   loading: boolean;
+  isDriver?: boolean;
 }
 
 const MAX_PREVIEW_RESULTS = 3;
@@ -27,13 +28,16 @@ export default function SearchResults({
   jobs,
   counts,
   loading,
+  isDriver = false,
 }: Props) {
   const router = useRouter();
 
-  // Only show maximum 3 in Hero search preview
-  const previewDrivers = drivers.slice(0, MAX_PREVIEW_RESULTS);
+  // Only show drivers if user is NOT a driver
+  const previewDrivers = isDriver ? [] : drivers.slice(0, MAX_PREVIEW_RESULTS);
 
   const previewJobs = jobs.slice(0, MAX_PREVIEW_RESULTS);
+
+  const totalFound = isDriver ? counts.jobs : counts.total;
 
   // ============================================================
   // LOADING
@@ -61,7 +65,7 @@ export default function SearchResults({
   // EMPTY
   // ============================================================
 
-  if (counts.total === 0) {
+  if (totalFound === 0) {
     return (
       <div
         className="
@@ -147,7 +151,7 @@ export default function SearchResults({
             text-[var(--text-muted)]
           "
         >
-          {counts.total} found
+          {totalFound} found
         </span>
       </div>
 
@@ -156,7 +160,7 @@ export default function SearchResults({
             DRIVERS
         ====================================================== */}
 
-        {previewDrivers.length > 0 && (
+        {!isDriver && previewDrivers.length > 0 && (
           <div>
             {/* Driver Header */}
 

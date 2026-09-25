@@ -14,6 +14,8 @@ export interface CreateJobPayload {
   requirements?: string;
   requiresTKT: boolean;
   hrId: number;
+  isDirectOffer?: boolean;
+  assignedDriverId?: number | null;
 }
 
 export interface DriverJob {
@@ -31,6 +33,8 @@ export interface DriverJob {
   requirements: string | null;
   requiresTKT: boolean;
   hrId: number;
+  isDirectOffer?: boolean;
+  assignedDriverId?: number | null;
   createdAt: string;
   updatedAt: string;
 }

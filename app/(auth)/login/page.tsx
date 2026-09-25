@@ -7,6 +7,7 @@ import axios from "axios";
 
 import {
   Mail,
+  Phone,
   Lock,
   Eye,
   EyeOff,
@@ -23,6 +24,7 @@ import { useAuthStore } from "@/store/authStore";
 
 import type { UserRole } from "@/type/auth";
 import { useLoginDriver, useLoginHR } from "@/lib/api/apiCall";
+import { validateLoginIdentifier } from "@/lib/utils/validation";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -54,18 +56,26 @@ export default function LoginPage() {
 
     setErrorMsg("");
 
-    const email = formData.email.trim();
+    const identifier = formData.email.trim();
     const password = formData.password;
 
-    if (!email || !password) {
-      setErrorMsg("Please enter both your email address and password.");
+    if (!identifier || !password) {
+      setErrorMsg("Please enter both your email/phone and password.");
+      return;
+    }
 
+    const validation = validateLoginIdentifier(identifier);
+    if (!validation.valid) {
+      setErrorMsg(
+        validation.message ||
+          "Please enter a valid email address (e.g. driver@gmail.com) or Swedish phone number (+46 70 123 45 67 / 070 123 45 67)."
+      );
       return;
     }
 
     try {
       const payload = {
-        email,
+        email: identifier,
         password,
       };
 
@@ -74,7 +84,7 @@ export default function LoginPage() {
 
         setAuth(response.driver, "driver");
 
-        router.replace("/EmployerJobFeed");
+        router.replace("/dashboard");
 
         return;
       }
@@ -83,7 +93,7 @@ export default function LoginPage() {
 
       setAuth(response.hr, "hr");
 
-      router.replace("/ExploreDrivers");
+      router.replace("/dashboard");
     } catch (error: unknown) {
       console.error("Login error:", error);
 
@@ -288,21 +298,23 @@ export default function LoginPage() {
                       text-[#172012]
                     "
                   >
-                    {role === "driver" ? "Driver Email" : "Company Email"}
+                    {role === "driver"
+                      ? "Driver Email or Swedish Phone Number"
+                      : "Company Email or Swedish Phone Number"}
                   </label>
 
                   <div className="relative">
                     <input
                       id="email"
                       name="email"
-                      type="email"
-                      autoComplete="email"
+                      type="text"
+                      autoComplete="username"
                       required
                       disabled={isLoggingIn}
                       placeholder={
                         role === "driver"
-                          ? "driver@example.com"
-                          : "fleet.manager@company.se"
+                          ? "driver@gmail.com or +46 70 123 45 67"
+                          : "fleet.manager@company.se or +46 8 123 45 67"
                       }
                       value={formData.email}
                       onChange={(e) => {
@@ -339,18 +351,34 @@ export default function LoginPage() {
                       "
                     />
 
-                    <Mail
-                      className="
-                        pointer-events-none
-                        absolute
-                        left-3
-                        top-1/2
-                        h-4
-                        w-4
-                        -translate-y-1/2
-                        text-[#8A9384]
-                      "
-                    />
+                    {/^[\d\s\+\-\(\)]+$/.test(formData.email.trim()) &&
+                    formData.email.trim().length > 0 ? (
+                      <Phone
+                        className="
+                          pointer-events-none
+                          absolute
+                          left-3
+                          top-1/2
+                          h-4
+                          w-4
+                          -translate-y-1/2
+                          text-[#6A8832]
+                        "
+                      />
+                    ) : (
+                      <Mail
+                        className="
+                          pointer-events-none
+                          absolute
+                          left-3
+                          top-1/2
+                          h-4
+                          w-4
+                          -translate-y-1/2
+                          text-[#8A9384]
+                        "
+                      />
+                    )}
                   </div>
                 </div>
 

@@ -1,12 +1,14 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { useRouter } from "next/navigation";
 import { AnimatePresence, motion } from "framer-motion";
-import { AlertCircle, RefreshCw, X } from "lucide-react";
+import { AlertCircle, Briefcase, RefreshCw, X } from "lucide-react";
 
 import { useDebounce } from "@/lib/hook/useDebounce";
 import { Driver } from "@/type/driver";
 import { useDrivers } from "@/lib/hook/useDrivers";
+import { useAuthStore } from "@/store/authStore";
 import DriverExplorerHeader from "@/components/drivers/DriverExplorerHeader";
 import DriverSearchBar from "@/components/drivers/DriverSearchBar";
 import DriverFilters from "@/components/drivers/DriverFilters";
@@ -17,6 +19,26 @@ import MessageDriverModal from "@/components/drivers/MessageDriverModal";
 import HireDriverModal from "@/components/drivers/HireDriverModal";
 
 export default function DriverExplorer() {
+  const router = useRouter();
+  const [mounted, setMounted] = useState(false);
+
+  // Check authenticated role
+  const authRole = useAuthStore(
+    (state) => state.role || (state.user as any)?.role?.toLowerCase()
+  );
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  const isDriver = mounted && authRole === "driver";
+
+  useEffect(() => {
+    if (isDriver) {
+      router.replace("/EmployerJobFeed");
+    }
+  }, [isDriver, router]);
+
   // Query parameters state
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedRegion, setSelectedRegion] = useState("All Regions");
@@ -94,6 +116,29 @@ export default function DriverExplorer() {
     setLimit(newLimit);
     setPage(1);
   };
+
+  if (isDriver) {
+    return (
+      <main className="min-h-screen flex items-center justify-center bg-background px-4 py-16 text-center">
+        <div className="max-w-md rounded-3xl border border-border bg-surface p-8 shadow-xs">
+          <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-primary/10 text-primary">
+            <Briefcase className="h-7 w-7" />
+          </div>
+          <h2 className="mt-4 text-base font-bold text-text">Driver Portal Active</h2>
+          <p className="mt-2 text-xs text-text-muted">
+            As a registered driver, you cannot browse or hire other drivers. Redirecting you to driving job opportunities...
+          </p>
+          <button
+            type="button"
+            onClick={() => router.push("/EmployerJobFeed")}
+            className="mt-6 inline-flex cursor-pointer items-center justify-center gap-2 rounded-xl bg-primary px-5 py-2.5 text-xs font-bold text-white shadow-xs transition hover:bg-primary-hover"
+          >
+            Go to Driving Jobs
+          </button>
+        </div>
+      </main>
+    );
+  }
 
   return (
     <main className="min-h-screen bg-background px-4 py-6 text-text sm:px-6 sm:py-8 lg:px-8">

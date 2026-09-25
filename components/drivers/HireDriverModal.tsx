@@ -15,6 +15,8 @@ import {
   X,
 } from "lucide-react";
 import { Driver } from "@/type/driver";
+import { useAuthStore } from "@/store/authStore";
+import { useSendMessage } from "@/lib/hook/useDashboard";
 
 type Props = {
   driver: Driver;
@@ -29,13 +31,47 @@ export default function HireDriverModal({ driver, onClose }: Props) {
   const [sending, setSending] = useState(false);
   const [sentSuccess, setSentSuccess] = useState(false);
 
+  const { user } = useAuthStore();
+  const sendMessageMutation = useSendMessage();
+
   const handleHireRequest = async () => {
     if (!jobTitle.trim() || sending) return;
 
     setSending(true);
 
     try {
-      await new Promise((resolve) => setTimeout(resolve, 800));
+      const senderHrId = user && "id" in user ? Number((user as any).id) : undefined;
+      const senderName =
+        user && "name" in user
+          ? String((user as any).name)
+          : user && "companyName" in user
+          ? String((user as any).companyName)
+          : "Fleet Recruiter";
+      const senderCompany =
+        user && "companyName" in user
+          ? String((user as any).companyName)
+          : "Fleet Operations";
+      const senderPhone =
+        user && "phoneNumber" in user ? String((user as any).phoneNumber) : undefined;
+      const senderEmail =
+        user && "email" in user ? String((user as any).email) : undefined;
+
+      await sendMessageMutation.mutateAsync({
+        senderHrId,
+        senderName,
+        senderCompany,
+        senderPhone,
+        senderEmail,
+        receiverDriverId: Number(driver.id),
+        subject: `Hiring Proposal: ${jobTitle.trim()} (${employmentType})`,
+        content: `Position: ${jobTitle.trim()}\nType: ${employmentType}${
+          startDate ? `\nStart Date: ${startDate}` : ""
+        }\n\n${
+          message.trim() ||
+          "We would like to extend a hiring proposal for you to join our driving team."
+        }`,
+      });
+
       setSentSuccess(true);
       setTimeout(() => {
         onClose();

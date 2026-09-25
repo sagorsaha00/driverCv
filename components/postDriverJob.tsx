@@ -14,7 +14,9 @@ import {
   CheckCircle2,
   Loader2,
   MapPin,
+  Radio,
   ShieldCheck,
+  UserCheck,
 } from "lucide-react";
 
 import { useRouter } from "next/navigation";
@@ -24,6 +26,7 @@ import { useAuthStore } from "@/store/authStore";
 
 import type { HR } from "@/type/auth";
 import { useCreateJob } from "@/lib/api/apiCall";
+import { useDrivers } from "@/lib/hook/useDrivers";
 
 const vehicleCategories = [
   "Personbil / Private Car (B)",
@@ -145,8 +148,13 @@ export default function PostDriverJob() {
 
   const [publishedCompanyName, setPublishedCompanyName] = useState("");
 
+  const [isDirectOffer, setIsDirectOffer] = useState(false);
+
+  const [assignedDriverId, setAssignedDriverId] = useState<number | null>(null);
+
+  const { allDrivers } = useDrivers({ limit: 100 });
+
   const [jobData, setJobData] = useState<JobData>(() => createInitialJobData());
- 
 
   useEffect(() => {
     if (!hr?.companyName) {
@@ -294,6 +302,10 @@ export default function PostDriverJob() {
         requiresTKT: jobData.requiresTKT,
 
         hrId: hr.id,
+
+        isDirectOffer,
+
+        assignedDriverId: isDirectOffer ? assignedDriverId : null,
       });
 
       /*
@@ -606,6 +618,79 @@ export default function PostDriverJob() {
                           <p className="mt-1 text-xs text-[var(--text-muted)]">
                             Tell drivers what position you are hiring for.
                           </p>
+                        </div>
+
+                        {/* JOB POST DISTRIBUTION TYPE */}
+                        <div className="rounded-2xl border border-[var(--border)] bg-[var(--surface-subtle)] p-4 space-y-3">
+                          <div>
+                            <label className="block text-xs font-bold text-[var(--text)]">
+                              Vacancy Distribution Mode
+                            </label>
+                            <p className="mt-0.5 text-[11px] text-[var(--text-muted)]">
+                              Publish publicly to all Swedish drivers or dispatch an exclusive offer to a specific driver
+                            </p>
+                          </div>
+
+                          <div className="grid grid-cols-1 gap-2.5 sm:grid-cols-2">
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setIsDirectOffer(false);
+                                setAssignedDriverId(null);
+                              }}
+                              className={`flex items-start gap-3 rounded-xl border p-3 text-left transition cursor-pointer ${
+                                !isDirectOffer
+                                  ? "border-[var(--primary)] bg-[var(--surface)] shadow-xs ring-1 ring-[var(--primary)]"
+                                  : "border-[var(--border)] bg-[var(--surface)] text-[var(--text-muted)] hover:border-[var(--border-strong)]"
+                              }`}
+                            >
+                              <Radio className={`h-4 w-4 mt-0.5 shrink-0 ${!isDirectOffer ? "text-[var(--primary)]" : "text-[var(--text-subtle)]"}`} />
+                              <div>
+                                <p className="text-xs font-bold text-[var(--text)]">Public Job Posting</p>
+                                <p className="mt-0.5 text-[10px] text-[var(--text-muted)]">
+                                  Broadcasts to all drivers & sends global job alert
+                                </p>
+                              </div>
+                            </button>
+
+                            <button
+                              type="button"
+                              onClick={() => setIsDirectOffer(true)}
+                              className={`flex items-start gap-3 rounded-xl border p-3 text-left transition cursor-pointer ${
+                                isDirectOffer
+                                  ? "border-[var(--primary)] bg-[var(--surface)] shadow-xs ring-1 ring-[var(--primary)]"
+                                  : "border-[var(--border)] bg-[var(--surface)] text-[var(--text-muted)] hover:border-[var(--border-strong)]"
+                              }`}
+                            >
+                              <UserCheck className={`h-4 w-4 mt-0.5 shrink-0 ${isDirectOffer ? "text-[var(--primary)]" : "text-[var(--text-subtle)]"}`} />
+                              <div>
+                                <p className="text-xs font-bold text-[var(--text)]">Personal / Direct Offer</p>
+                                <p className="mt-0.5 text-[10px] text-[var(--text-muted)]">
+                                  Assign directly to a driver with private notification
+                                </p>
+                              </div>
+                            </button>
+                          </div>
+
+                          {isDirectOffer && (
+                            <div className="pt-2 border-t border-[var(--border-subtle)]">
+                              <label className="mb-1.5 block text-xs font-bold text-[var(--text)]">
+                                Select Target Driver *
+                              </label>
+                              <select
+                                value={assignedDriverId || ""}
+                                onChange={(e) => setAssignedDriverId(Number(e.target.value) || null)}
+                                className="h-11 w-full rounded-xl border border-[var(--border)] bg-[var(--surface)] px-3 text-xs font-semibold text-[var(--text)] outline-none transition focus:border-[var(--primary)]"
+                              >
+                                <option value="">-- Choose a driver from verified network --</option>
+                                {allDrivers.map((d) => (
+                                  <option key={d.id} value={d.id}>
+                                    {d.fullname} • {d.licenseCategories?.join(", ") || "Driver"} • {d.regions?.join(", ") || "Sweden"}
+                                  </option>
+                                ))}
+                              </select>
+                            </div>
+                          )}
                         </div>
 
                         {/* JOB TITLE */}

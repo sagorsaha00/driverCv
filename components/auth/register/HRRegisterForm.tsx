@@ -15,6 +15,11 @@ import {
 import type { HRFormData } from "./types";
 import { useAuthStore } from "@/store/authStore";
 import { useRegisterHR } from "@/lib/api/apiCall";
+import {
+  isValidEmail,
+  isValidSwedishPhone,
+  isValidSwedishOrgNumber,
+} from "@/lib/utils/validation";
 
 const initialData: HRFormData = {
   name: "",
@@ -29,8 +34,23 @@ export default function HRRegisterForm() {
   const router = useRouter();
 
   const [data, setData] = useState<HRFormData>(initialData);
+  const [emailTouched, setEmailTouched] = useState(false);
+  const [phoneTouched, setPhoneTouched] = useState(false);
+  const [orgTouched, setOrgTouched] = useState(false);
 
   const mutation = useRegisterHR();
+
+  const isEmailValid = isValidEmail(data.email);
+  const isPhoneValid = isValidSwedishPhone(data.phoneNumber);
+  const isOrgValid = isValidSwedishOrgNumber(data.organizationNumber);
+
+  const isFormValid =
+    data.name.trim().length >= 2 &&
+    data.companyName.trim().length >= 2 &&
+    isOrgValid &&
+    isEmailValid &&
+    isPhoneValid &&
+    data.password.length >= 8;
 
   const update = (key: keyof HRFormData, value: string) => {
     setData((prev) => ({
@@ -41,6 +61,8 @@ export default function HRRegisterForm() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+
+    if (!isFormValid) return;
 
     mutation.mutate(
       {
@@ -88,32 +110,77 @@ export default function HRRegisterForm() {
           onChange={(value) => update("companyName", value)}
         />
 
-        <Field
-          label="Organization Number"
-          placeholder="556123-4567"
-          value={data.organizationNumber}
-          onChange={(value) => update("organizationNumber", value)}
-        />
+        <div>
+          <Field
+            label="Organization Number (Sweden)"
+            placeholder="556123-4567"
+            value={data.organizationNumber}
+            onChange={(value) => {
+              update("organizationNumber", value);
+              setOrgTouched(true);
+            }}
+          />
+          {orgTouched && !isOrgValid && (
+            <p className="mt-1 text-[11px] font-medium text-red-600">
+              Must be a valid 10-digit Swedish org number (e.g. 556123-4567)
+            </p>
+          )}
+          {data.organizationNumber && isOrgValid && (
+            <p className="mt-1 text-[11px] font-medium text-emerald-600">
+              ✓ Valid Swedish org number
+            </p>
+          )}
+        </div>
       </div>
 
       <div className="grid gap-4 sm:grid-cols-2">
-        <Field
-          icon={<Mail />}
-          label="Email"
-          type="email"
-          placeholder="hr@company.se"
-          value={data.email}
-          onChange={(value) => update("email", value)}
-        />
+        <div>
+          <Field
+            icon={<Mail />}
+            label="Company Email"
+            type="email"
+            placeholder="hr@company.se"
+            value={data.email}
+            onChange={(value) => {
+              update("email", value);
+              setEmailTouched(true);
+            }}
+          />
+          {emailTouched && !isEmailValid && (
+            <p className="mt-1 text-[11px] font-medium text-red-600">
+              Please enter a valid email address (e.g. hr@company.se)
+            </p>
+          )}
+          {data.email && isEmailValid && (
+            <p className="mt-1 text-[11px] font-medium text-emerald-600">
+              ✓ Valid email format
+            </p>
+          )}
+        </div>
 
-        <Field
-          icon={<Phone />}
-          label="Phone"
-          type="tel"
-          placeholder="+46 70 123 45 67"
-          value={data.phoneNumber}
-          onChange={(value) => update("phoneNumber", value)}
-        />
+        <div>
+          <Field
+            icon={<Phone />}
+            label="Phone (Sweden)"
+            type="tel"
+            placeholder="+46 8 123 45 67 or 070 123 45 67"
+            value={data.phoneNumber}
+            onChange={(value) => {
+              update("phoneNumber", value);
+              setPhoneTouched(true);
+            }}
+          />
+          {phoneTouched && !isPhoneValid && (
+            <p className="mt-1 text-[11px] font-medium text-red-600">
+              Must be a valid Swedish phone (+46... or 07X...)
+            </p>
+          )}
+          {data.phoneNumber && isPhoneValid && (
+            <p className="mt-1 text-[11px] font-medium text-emerald-600">
+              ✓ Valid Swedish phone format
+            </p>
+          )}
+        </div>
       </div>
 
       <Field
@@ -135,8 +202,8 @@ export default function HRRegisterForm() {
 
       <button
         type="submit"
-        disabled={mutation.isPending || data.password.length < 8}
-        className="flex w-full items-center justify-center gap-2 rounded-xl bg-primary py-3 text-sm font-bold text-primary-foreground disabled:opacity-50"
+        disabled={mutation.isPending || !isFormValid}
+        className="flex w-full cursor-pointer items-center justify-center gap-2 rounded-xl bg-primary py-3 text-sm font-bold text-primary-foreground disabled:cursor-not-allowed disabled:opacity-50"
       >
         {mutation.isPending ? (
           <>
