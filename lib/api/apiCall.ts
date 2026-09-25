@@ -4,6 +4,7 @@ import { useMutation, useQuery } from "@tanstack/react-query";
 
 import {
   createJob,
+  driverJobService,
   getJobs,
   loginDriver,
   loginHR,
@@ -54,3 +55,28 @@ export const useJobs = () => {
     queryFn: getJobs,
   });
 };
+export const driverJobKeys = {
+  all: ["driver-jobs"] as const,
+
+  list: () => [...driverJobKeys.all, "list"] as const,
+};
+
+export function useDriverJobs() {
+  return useQuery({
+    queryKey: driverJobKeys.list(),
+    queryFn: driverJobService.getAllDriverJobs,
+    staleTime: 1000 * 60 * 2,
+    refetchOnWindowFocus: false,
+    retry: 1,
+  });
+}
+export function useDriverJob(id: number) {
+  return useQuery({
+    queryKey: ["driver-job", id],
+    queryFn: () => driverJobService.getDriverJobById(id),
+    enabled: Number.isFinite(id) && id > 0,
+    staleTime: 1000 * 60 * 2,
+    retry: 1,
+    refetchOnWindowFocus: false,
+  });
+}

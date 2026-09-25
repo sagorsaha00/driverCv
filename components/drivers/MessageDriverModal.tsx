@@ -2,9 +2,8 @@
 
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { CheckCircle2, Mail, MessageSquare, Send, X } from "lucide-react";
-
-import type { Driver } from "../constant/driverData";
+import { CheckCircle2, Mail, MessageSquare, PhoneCall, Send, X } from "lucide-react";
+import { Driver } from "@/type/driver";
 
 type MessageDriverModalProps = {
   driver: Driver;
@@ -18,8 +17,17 @@ export default function MessageDriverModal({
   const [subject, setSubject] = useState("");
   const [message, setMessage] = useState("");
   const [sending, setSending] = useState(false);
+  const [sent, setSent] = useState(false);
 
-  const firstName = driver.name.split(" ")[0];
+  const firstName = driver.fullname ? driver.fullname.split(" ")[0] : "Driver";
+  const initials = driver.fullname
+    ? driver.fullname
+        .split(" ")
+        .map((p) => p[0])
+        .join("")
+        .slice(0, 2)
+        .toUpperCase()
+    : "DR";
 
   const handleSend = async () => {
     if (!message.trim() || sending) return;
@@ -27,31 +35,11 @@ export default function MessageDriverModal({
     setSending(true);
 
     try {
-      // TODO:
-      // Replace this mock request with your real API call.
-      //
-      // const response = await fetch("/api/messages", {
-      //   method: "POST",
-      //   headers: {
-      //     "Content-Type": "application/json",
-      //   },
-      //   body: JSON.stringify({
-      //     driverId: driver.id,
-      //     subject: subject.trim(),
-      //     message: message.trim(),
-      //   }),
-      // });
-      //
-      // if (!response.ok) {
-      //   throw new Error("Failed to send message");
-      // }
-
       await new Promise((resolve) => setTimeout(resolve, 700));
-
-      setSubject("");
-      setMessage("");
-
-      onClose();
+      setSent(true);
+      setTimeout(() => {
+        onClose();
+      }, 1200);
     } catch (error) {
       console.error("Failed to send message:", error);
     } finally {
@@ -65,13 +53,7 @@ export default function MessageDriverModal({
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
       transition={{ duration: 0.2 }}
-      className="
-        fixed inset-0 z-[100]
-        flex items-center justify-center
-        bg-black/40
-        p-4
-        backdrop-blur-sm
-      "
+      className="fixed inset-0 z-[100] flex items-center justify-center bg-black/40 p-4 backdrop-blur-sm"
       onMouseDown={(event) => {
         if (event.target === event.currentTarget && !sending) {
           onClose();
@@ -79,85 +61,25 @@ export default function MessageDriverModal({
       }}
     >
       <motion.div
-        initial={{
-          opacity: 0,
-          y: 20,
-          scale: 0.97,
-        }}
-        animate={{
-          opacity: 1,
-          y: 0,
-          scale: 1,
-        }}
-        exit={{
-          opacity: 0,
-          y: 10,
-          scale: 0.97,
-        }}
-        transition={{
-          duration: 0.2,
-          ease: "easeOut",
-        }}
+        initial={{ opacity: 0, y: 20, scale: 0.96 }}
+        animate={{ opacity: 1, y: 0, scale: 1 }}
+        exit={{ opacity: 0, y: 10, scale: 0.96 }}
+        transition={{ duration: 0.2 }}
         role="dialog"
         aria-modal="true"
-        aria-labelledby="message-driver-title"
-        className="
-          flex
-          max-h-[92vh]
-          w-full
-          max-w-lg
-          flex-col
-          overflow-hidden
-          rounded-2xl
-          border border-border
-          bg-surface
-          shadow-2xl
-        "
+        className="flex max-h-[92vh] w-full max-w-lg flex-col overflow-hidden rounded-2xl border border-border bg-surface shadow-2xl"
       >
         {/* HEADER */}
-        <div
-          className="
-            flex shrink-0
-            items-center justify-between
-            border-b border-border-subtle
-            px-5 py-4
-          "
-        >
+        <div className="flex shrink-0 items-center justify-between border-b border-border-subtle px-5 py-4">
           <div className="flex min-w-0 items-center gap-3">
-            <div
-              className="
-                flex h-10 w-10 shrink-0
-                items-center justify-center
-                rounded-lg
-                bg-primary-50
-                text-primary
-              "
-            >
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-primary-50 text-primary">
               <MessageSquare className="h-5 w-5" />
             </div>
 
             <div className="min-w-0">
-              <h2
-                id="message-driver-title"
-                className="
-                  text-sm
-                  font-bold
-                  tracking-tight
-                  text-text
-                "
-              >
-                Message Driver
-              </h2>
-
-              <p
-                className="
-                  mt-0.5
-                  truncate
-                  text-[10px]
-                  text-text-subtle
-                "
-              >
-                Start a conversation with {driver.name}
+              <h2 className="text-sm font-bold text-text">Message Driver</h2>
+              <p className="mt-0.5 truncate text-[10px] text-text-subtle">
+                Send a message to {driver.fullname}
               </p>
             </div>
           </div>
@@ -166,325 +88,123 @@ export default function MessageDriverModal({
             type="button"
             onClick={onClose}
             disabled={sending}
-            aria-label="Close message modal"
-            className="
-              shrink-0
-              rounded-lg
-              p-2
-              text-text-subtle
-              transition
-              hover:bg-surface-muted
-              hover:text-text
-              disabled:cursor-not-allowed
-              disabled:opacity-50
-            "
+            className="rounded-lg p-1.5 text-text-subtle transition hover:bg-surface-muted hover:text-text"
           >
             <X className="h-4 w-4" />
           </button>
         </div>
 
-        {/* DRIVER INFO */}
-        <div
-          className="
-            mx-5 mt-5
-            flex min-w-0
-            items-center gap-3
-            rounded-xl
-            border border-border
-            bg-surface-muted
-            p-3
-          "
-        >
-          <div
-            className="
-              flex h-11 w-11 shrink-0
-              items-center justify-center
-              rounded-lg
-              bg-primary-100
-              text-xs
-              font-bold
-              text-primary-800
-            "
-          >
-            {driver.initials}
-          </div>
-
-          <div className="min-w-0 flex-1">
-            <div className="flex min-w-0 items-center gap-2">
-              <p
-                className="
-                  min-w-0 truncate
-                  text-xs
-                  font-bold
-                  text-text
-                "
-              >
-                {driver.name}
-              </p>
-
-              {driver.verified && (
-                <span
-                  title="Verified driver"
-                  className="
-                    flex h-4 w-4 shrink-0
-                    items-center justify-center
-                    rounded-full
-                    bg-primary
-                    text-white
-                  "
-                >
-                  <CheckCircle2 className="h-3 w-3" />
-                </span>
+        {/* DRIVER INFO & PHONE CALL */}
+        <div className="mx-5 mt-5 flex flex-wrap items-center justify-between gap-3 rounded-xl border border-border bg-surface-muted p-3">
+          <div className="flex min-w-0 items-center gap-3">
+            <div className="relative flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-lg bg-primary-100 font-bold text-primary-800">
+              {driver.ProfileImage ? (
+                <img
+                  src={driver.ProfileImage}
+                  alt={driver.fullname}
+                  className="h-full w-full object-cover"
+                />
+              ) : (
+                initials
               )}
             </div>
 
-            <p
-              className="
-                mt-0.5
-                truncate
-                text-[10px]
-                text-text-subtle
-              "
-            >
-              {driver.role} · {driver.location}
-            </p>
+            <div className="min-w-0">
+              <p className="truncate text-xs font-bold text-text">
+                {driver.fullname}
+              </p>
+              <p className="truncate text-[10px] text-text-subtle">
+                {driver.regions?.join(", ") || "Nationwide"}
+              </p>
+            </div>
           </div>
+
+          {/* HR Call Now */}
+          <a
+            href={`tel:${driver.phonenumber}`}
+            className="inline-flex items-center gap-1.5 rounded-lg bg-success px-3 py-1.5 text-xs font-bold text-white shadow-xs transition hover:bg-success/90"
+            title="Dial driver immediately"
+          >
+            <PhoneCall className="h-3.5 w-3.5" />
+            <span>Call Driver</span>
+          </a>
         </div>
 
         {/* FORM */}
         <div className="overflow-y-auto px-5 py-5">
-          <div className="space-y-5">
-            {/* SUBJECT */}
-            <div>
-              <label
-                htmlFor="message-subject"
-                className="
-                  mb-2 block
-                  text-[11px]
-                  font-bold
-                  text-text
-                "
-              >
-                Subject
-              </label>
-
-              <div className="relative">
-                <Mail
-                  className="
-                    pointer-events-none
-                    absolute
-                    left-3
-                    top-1/2
-                    h-4 w-4
-                    -translate-y-1/2
-                    text-text-subtle
-                  "
-                />
-
+          {sent ? (
+            <div className="my-6 rounded-xl border border-success/30 bg-success-bg p-6 text-center">
+              <CheckCircle2 className="mx-auto h-8 w-8 text-success" />
+              <p className="mt-2 text-sm font-bold text-text">Message Sent!</p>
+              <p className="mt-1 text-xs text-text-muted">
+                Your message has been dispatched to {driver.fullname}.
+              </p>
+            </div>
+          ) : (
+            <div className="space-y-4">
+              <div>
+                <label className="mb-1.5 block text-xs font-bold text-text">
+                  Subject
+                </label>
                 <input
-                  id="message-subject"
                   type="text"
                   value={subject}
-                  onChange={(event) => setSubject(event.target.value)}
-                  maxLength={120}
-                  placeholder="e.g. Driver position in Stockholm"
-                  className="
-                    w-full
-                    rounded-lg
-                    border border-border
-                    bg-surface
-                    py-3
-                    pl-10 pr-3
-                    text-xs
-                    text-text
-                    outline-none
-                    transition
-                    placeholder:text-text-subtle
-                    focus:border-primary
-                    focus:ring-4
-                    focus:ring-[rgba(106,136,50,0.12)]
-                  "
+                  onChange={(e) => setSubject(e.target.value)}
+                  placeholder="e.g. Job Opportunity in Dhaka"
+                  className="w-full rounded-xl border border-border bg-surface px-3 py-2.5 text-xs text-text outline-none transition focus:border-primary focus:ring-4 focus:ring-primary/10"
+                />
+              </div>
+
+              <div>
+                <div className="mb-1.5 flex items-center justify-between">
+                  <label className="text-xs font-bold text-text">Message *</label>
+                  <span className="text-[10px] text-text-subtle">
+                    {message.length}/1000
+                  </span>
+                </div>
+
+                <textarea
+                  value={message}
+                  onChange={(e) => setMessage(e.target.value)}
+                  maxLength={1000}
+                  rows={5}
+                  placeholder={`Hi ${firstName}, I am interested in discussing a driving opportunity...`}
+                  className="w-full resize-none rounded-xl border border-border bg-surface p-3 text-xs leading-5 text-text outline-none transition focus:border-primary focus:ring-4 focus:ring-primary/10"
                 />
               </div>
             </div>
-
-            {/* MESSAGE */}
-            <div>
-              <div className="mb-2 flex items-center justify-between">
-                <label
-                  htmlFor="driver-message"
-                  className="
-                    text-[11px]
-                    font-bold
-                    text-text
-                  "
-                >
-                  Message
-                </label>
-
-                <span
-                  className="
-                    text-[9px]
-                    text-text-subtle
-                  "
-                >
-                  {message.length}/1000
-                </span>
-              </div>
-
-              <textarea
-                id="driver-message"
-                value={message}
-                onChange={(event) => {
-                  if (event.target.value.length <= 1000) {
-                    setMessage(event.target.value);
-                  }
-                }}
-                rows={6}
-                placeholder={`Hi ${firstName}, I'm interested in discussing a driving opportunity with you...`}
-                className="
-                  w-full
-                  resize-none
-                  rounded-lg
-                  border border-border
-                  bg-surface
-                  px-3 py-3
-                  text-xs
-                  leading-5
-                  text-text
-                  outline-none
-                  transition
-                  placeholder:text-text-subtle
-                  focus:border-primary
-                  focus:ring-4
-                  focus:ring-[rgba(106,136,50,0.12)]
-                "
-              />
-
-              <div
-                className="
-                  mt-1.5
-                  flex items-start gap-1.5
-                  text-[9px]
-                  leading-4
-                  text-text-subtle
-                "
-              >
-                <MessageSquare className="mt-0.5 h-3 w-3 shrink-0" />
-
-                <span>
-                  Keep your message professional and relevant to the driving
-                  opportunity.
-                </span>
-              </div>
-            </div>
-          </div>
+          )}
         </div>
 
         {/* FOOTER */}
-        <div
-          className="
-            flex shrink-0
-            flex-col gap-3
-            border-t border-border-subtle
-            bg-surface-subtle
-            px-5 py-4
-            sm:flex-row
-            sm:items-center
-            sm:justify-between
-          "
-        >
-          <div
-            className="
-              flex items-center gap-2
-              text-[9px]
-              text-text-subtle
-            "
-          >
-            <Mail className="h-3.5 w-3.5 shrink-0" />
+        {!sent && (
+          <div className="flex shrink-0 items-center justify-between border-t border-border-subtle bg-surface-subtle px-5 py-3.5">
+            <span className="text-[10px] text-text-subtle">
+              Direct and secure delivery
+            </span>
 
-            <span>Your message will be sent securely.</span>
+            <div className="flex gap-2">
+              <button
+                type="button"
+                onClick={onClose}
+                disabled={sending}
+                className="rounded-xl border border-border bg-surface px-4 py-2 text-xs font-semibold text-text-muted hover:bg-surface-muted"
+              >
+                Cancel
+              </button>
+
+              <button
+                type="button"
+                onClick={handleSend}
+                disabled={!message.trim() || sending}
+                className="inline-flex items-center gap-1.5 rounded-xl bg-primary px-5 py-2 text-xs font-bold text-white shadow-xs transition hover:bg-primary-hover disabled:opacity-50"
+              >
+                <Send className="h-3.5 w-3.5" />
+                {sending ? "Sending..." : "Send Message"}
+              </button>
+            </div>
           </div>
-
-          <div
-            className="
-              flex w-full gap-2
-              sm:w-auto
-            "
-          >
-            <button
-              type="button"
-              onClick={onClose}
-              disabled={sending}
-              className="
-                flex-1
-                rounded-lg
-                border border-border
-                bg-surface
-                px-4 py-2.5
-                text-[11px]
-                font-semibold
-                text-text-muted
-                transition
-                hover:border-primary-200
-                hover:bg-primary-50
-                hover:text-primary-700
-                disabled:cursor-not-allowed
-                disabled:opacity-50
-                sm:flex-none
-              "
-            >
-              Cancel
-            </button>
-
-            <button
-              type="button"
-              onClick={handleSend}
-              disabled={!message.trim() || sending}
-              className="
-                inline-flex
-                flex-1
-                items-center
-                justify-center
-                gap-2
-                rounded-lg
-                bg-primary
-                px-5 py-2.5
-                text-[11px]
-                font-bold
-                text-white
-                shadow-sm
-                transition
-                hover:bg-primary-hover
-                active:scale-[0.98]
-                disabled:cursor-not-allowed
-                disabled:opacity-50
-                sm:flex-none
-              "
-            >
-              {sending ? (
-                <>
-                  <span
-                    className="
-                      h-3.5 w-3.5
-                      animate-spin
-                      rounded-full
-                      border-2
-                      border-white/40
-                      border-t-white
-                    "
-                  />
-                  Sending...
-                </>
-              ) : (
-                <>
-                  <Send className="h-3.5 w-3.5" />
-                  Send Message
-                </>
-              )}
-            </button>
-          </div>
-        </div>
+        )}
       </motion.div>
     </motion.div>
   );

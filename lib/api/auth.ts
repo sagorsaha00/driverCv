@@ -10,6 +10,7 @@ import type {
   LoginPayload,
 } from "@/type/auth";
 import { CreateJobPayload, CreateJobResponse, DriverJob } from "@/type/job";
+import { GetDriverJobResponse, GetDriverJobsResponse } from "@/type/driverJob";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
 
@@ -58,7 +59,10 @@ export const loginHR = async (
 export const createJob = async (
   payload: CreateJobPayload,
 ): Promise<CreateJobResponse> => {
-  const response = await api.post<CreateJobResponse>("/api/driverJob/createDriverJob", payload);
+  const response = await api.post<CreateJobResponse>(
+    "/api/driverJob/createDriverJob",
+    payload,
+  );
 
   return response.data;
 };
@@ -69,4 +73,33 @@ export const getJobs = async (): Promise<DriverJob[]> => {
   }>("/api/driverJob/getAllDriverJobs");
 
   return response.data.jobs;
+};
+export const driverJobService = {
+  getAllDriverJobs: async (): Promise<GetDriverJobsResponse> => {
+    const response = await fetch(`${API_URL}/api/driverJob/getAllDriverJobs`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error("Failed to fetch driver jobs");
+    }
+
+    return response.json();
+  },
+  getDriverJobById: async (id: number): Promise<GetDriverJobResponse> => {
+    const response = await fetch(`${API_URL}/api/driverJob/singleJob/${id}`);
+
+    if (!response.ok) {
+      if (response.status === 404) {
+        throw new Error("Job not found");
+      }
+
+      throw new Error("Failed to fetch job");
+    }
+
+    return response.json();
+  },
 };

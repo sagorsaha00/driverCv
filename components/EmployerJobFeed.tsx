@@ -1,141 +1,85 @@
 "use client";
 
 import { useMemo, useState } from "react";
+
 import { AnimatePresence, motion } from "framer-motion";
+
 import {
-  Search,
-  MapPin,
+  AlertCircle,
   Briefcase,
-  Clock,
-  Banknote,
-  Car,
-  Building2,
-  Calendar,
-  ShieldCheck,
   ChevronRight,
-  CheckCircle2,
+  RefreshCw,
+  ShieldCheck,
   Sparkles,
-  X,
-  SlidersHorizontal,
 } from "lucide-react";
+
 import Link from "next/link";
-
-interface JobPost {
-  id: string;
-  title: string;
-  company: string;
-  location: string;
-  licenseRequired: string;
-  employmentType: string;
-  salary: string;
-  postedDate: string;
-  description: string;
-  tags: string[];
-}
-
-const mockJobs: JobPost[] = [
-  {
-    id: "1",
-    title: "C-Driver for Regional Distribution",
-    company: "Nordic Transport AB",
-    location: "Stockholm",
-    licenseRequired: "Heavy Truck (C)",
-    employmentType: "Full-time (Heltid)",
-    salary: "33,500 SEK / month",
-    postedDate: "2 days ago",
-    description:
-      "Seeking an experienced distribution driver for fixed daytime delivery routes across greater Stockholm. Clean fleet, Scania & Volvo trucks provided.",
-    tags: ["YKB Required", "Day Shift", "Digital Tacho", "Direct Employer"],
-  },
-  {
-    id: "2",
-    title: "Public Transit & Charter Bus Driver",
-    company: "Sverige Buss & Travel",
-    location: "Gothenburg",
-    licenseRequired: "Bus (D)",
-    employmentType: "Full-time / Shift",
-    salary: "31,800 SEK / month",
-    postedDate: "Today",
-    description:
-      "Looking for certified Class D bus drivers for scheduled urban and regional coach lines in Gothenburg. Collective agreement guaranteed.",
-    tags: ["D License", "Kollektivavtal", "Shift Work", "Pension Scheme"],
-  },
-  {
-    id: "3",
-    title: "VIP Chauffeur / Executive Taxi",
-    company: "City Cab Sweden",
-    location: "Malmö",
-    licenseRequired: "Taxi (TKT)",
-    employmentType: "Part-time / Flexible",
-    salary: "210 SEK / hour",
-    postedDate: "3 days ago",
-    description:
-      "Seeking drivers with a valid Taxi Driver Badge (TKT) for executive transfers and weekend airport services between Malmö and Copenhagen.",
-    tags: ["TKT Required", "Premium Sedan", "Flexible Hours", "Weekend Bonus"],
-  },
-  {
-    id: "4",
-    title: "CE-Driver Long-Haul Freight",
-    company: "ScanLogistics AB",
-    location: "Jönköping",
-    licenseRequired: "Truck & Trailer (CE)",
-    employmentType: "Full-time (Heltid)",
-    salary: "37,500 SEK / month",
-    postedDate: "1 week ago",
-    description:
-      "Long-distance freight transport with heavy truck and semi-trailer between Jönköping logistics hubs and northern Sweden.",
-    tags: ["CE License", "YKB Required", "Night Allowance", "Modern Rig"],
-  },
-  {
-    id: "5",
-    title: "Delivery Van Courier",
-    company: "FastCargo Nordic",
-    location: "Stockholm",
-    licenseRequired: "Car / Van (B)",
-    employmentType: "Full-time (Heltid)",
-    salary: "27,000 SEK / month",
-    postedDate: "Yesterday",
-    description:
-      "Seeking energetic parcel delivery drivers for e-commerce routes in southern Stockholm. Mercedes Sprinter provided.",
-    tags: ["Class B", "Vehicle Provided", "Smart Route App", "Team Bonus"],
-  },
-];
-
-const locations = ["All", "Stockholm", "Gothenburg", "Malmö", "Jönköping"];
-
-const licenseTypes = ["All", "B", "C", "CE", "D", "Taxi"];
+import { DriverJob } from "@/type/driverJob";
+import { useDriverJobs } from "@/lib/api/apiCall";
+import JobFilters from "./job/JobFilters";
+import JobCard from "./job/JobCard";
+import JobApplicationModal from "./job/JobApplicationModal";
+import JobCardSkeleton from "./job/JobCardSkeleton";
+import JobEmptyState from "./job/JobEmptyState";
 
 export default function EmployerJobFeed() {
   const [searchTerm, setSearchTerm] = useState("");
+
   const [selectedLocation, setSelectedLocation] = useState("All");
+
   const [selectedLicense, setSelectedLicense] = useState("All");
-  const [appliedJob, setAppliedJob] = useState<JobPost | null>(null);
+
+  const [appliedJob, setAppliedJob] = useState<DriverJob | null>(null);
+
+  const { data, isLoading, isFetching, isError, error, refetch } =
+    useDriverJobs();
+
+  const jobs = data?.jobs ?? [];
+
+  const locations = useMemo(() => {
+    return Array.from(
+      new Set(jobs.map((job) => job.location.trim()).filter(Boolean)),
+    ).sort((a, b) => a.localeCompare(b));
+  }, [jobs]);
+
+  const licenseTypes = useMemo(() => {
+    return Array.from(
+      new Set(jobs.map((job) => job.vehicleRequired.trim()).filter(Boolean)),
+    ).sort((a, b) => a.localeCompare(b));
+  }, [jobs]);
 
   const filteredJobs = useMemo(() => {
     const search = searchTerm.trim().toLowerCase();
 
-    return mockJobs.filter((job) => {
+    return jobs.filter((job) => {
+      const requirements = job.requirements?.toLowerCase() ?? "";
+
       const matchesSearch =
         !search ||
-        job.title.toLowerCase().includes(search) ||
-        job.company.toLowerCase().includes(search) ||
+        job.jobTitle.toLowerCase().includes(search) ||
+        job.companyName.toLowerCase().includes(search) ||
         job.location.toLowerCase().includes(search) ||
-        job.licenseRequired.toLowerCase().includes(search) ||
+        job.vehicleRequired.toLowerCase().includes(search) ||
         job.employmentType.toLowerCase().includes(search) ||
-        job.tags.some((tag) => tag.toLowerCase().includes(search));
+        job.workingHours.toLowerCase().includes(search) ||
+        job.jobDescription.toLowerCase().includes(search) ||
+        requirements.includes(search) ||
+        job.hr.name.toLowerCase().includes(search) ||
+        job.hr.companyName.toLowerCase().includes(search);
 
       const matchesLocation =
         selectedLocation === "All" || job.location === selectedLocation;
 
       const matchesLicense =
-        selectedLicense === "All" ||
-        job.licenseRequired
-          .toLowerCase()
-          .includes(selectedLicense.toLowerCase());
+        selectedLicense === "All" || job.vehicleRequired === selectedLicense;
 
       return matchesSearch && matchesLocation && matchesLicense;
     });
-  }, [searchTerm, selectedLocation, selectedLicense]);
+  }, [jobs, searchTerm, selectedLocation, selectedLicense]);
+
+  // ============================================================
+  // RESET FILTERS
+  // ============================================================
 
   const resetFilters = () => {
     setSearchTerm("");
@@ -143,28 +87,103 @@ export default function EmployerJobFeed() {
     setSelectedLicense("All");
   };
 
+  // ============================================================
+  // UI
+  // ============================================================
+
   return (
-    <main className="min-h-screen bg-[var(--background,_#f8fafc)] px-4 py-8 text-[var(--foreground,_#0f172a)] sm:px-6 lg:px-8">
-      <div className="mx-auto w-full max-w-6xl">
-        {/* Header */}
+    <main
+      className="
+        min-h-screen
+        bg-[var(--background,_#f8fafc)]
+        px-4
+        py-8
+        text-[var(--foreground,_#0f172a)]
+
+        sm:px-6
+        lg:px-8
+      "
+    >
+      <div
+        className="
+          mx-auto
+          w-full
+          max-w-6xl
+        "
+      >
+        {/* ======================================================
+            HEADER
+        ====================================================== */}
+
         <motion.div
-          initial={{ opacity: 0, y: 18 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.45 }}
+          initial={{
+            opacity: 0,
+            y: 18,
+          }}
+          animate={{
+            opacity: 1,
+            y: 0,
+          }}
+          transition={{
+            duration: 0.45,
+          }}
           className="mb-8"
         >
-          <div className="flex flex-col justify-between gap-5 sm:flex-row sm:items-end">
+          <div
+            className="
+              flex
+              flex-col
+              justify-between
+              gap-5
+
+              sm:flex-row
+              sm:items-end
+            "
+          >
             <div>
-              <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-[var(--primary,_#2563eb)]/20 bg-[var(--primary,_#2563eb)]/10 px-3 py-1.5 text-[11px] font-bold text-[var(--primary,_#2563eb)]">
+              <div
+                className="
+                  mb-3
+                  inline-flex
+                  items-center
+                  gap-2
+                  rounded-full
+                  border
+                  border-[var(--primary,_#2563eb)]/20
+                  bg-[var(--primary,_#2563eb)]/10
+                  px-3
+                  py-1.5
+                  text-[11px]
+                  font-bold
+                  text-[var(--primary,_#2563eb)]
+                "
+              >
                 <Sparkles className="h-3.5 w-3.5" />
                 Direct Transport Fleets
               </div>
 
-              <h1 className="text-2xl font-black tracking-tight text-[var(--foreground,_#0f172a)] sm:text-3xl">
+              <h1
+                className="
+                  text-2xl
+                  font-black
+                  tracking-tight
+                  text-[var(--foreground,_#0f172a)]
+
+                  sm:text-3xl
+                "
+              >
                 Available Driver Jobs in Sweden
               </h1>
 
-              <p className="mt-2 max-w-2xl text-sm leading-6 text-[var(--muted-foreground,_#64748b)]">
+              <p
+                className="
+                  mt-2
+                  max-w-2xl
+                  text-sm
+                  leading-6
+                  text-[var(--muted-foreground,_#64748b)]
+                "
+              >
                 Explore open driving positions posted directly by verified
                 transport companies across Sweden.
               </p>
@@ -172,7 +191,25 @@ export default function EmployerJobFeed() {
 
             <Link
               href="/PostDriverJob"
-              className="inline-flex w-fit items-center gap-2 rounded-xl bg-[var(--primary,_#2563eb)] px-4 py-2.5 text-xs font-bold text-[var(--primary-foreground,_#ffffff)] shadow-lg shadow-[var(--primary,_#2563eb)]/20 transition hover:opacity-90 active:scale-[0.98]"
+              className="
+                inline-flex
+                w-fit
+                items-center
+                gap-2
+                rounded-xl
+                bg-[var(--primary,_#2563eb)]
+                px-4
+                py-2.5
+                text-xs
+                font-bold
+                text-[var(--primary-foreground,_#ffffff)]
+                shadow-lg
+                shadow-[var(--primary,_#2563eb)]/20
+                transition
+
+                hover:opacity-90
+                active:scale-[0.98]
+              "
             >
               <Briefcase className="h-4 w-4" />
               Post a Vacancy
@@ -181,368 +218,245 @@ export default function EmployerJobFeed() {
           </div>
         </motion.div>
 
-        {/* Search & Filters */}
-        <motion.div
-          initial={{ opacity: 0, y: 14 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.45, delay: 0.08 }}
-          className="mb-6 rounded-2xl border border-[var(--border,_#e2e8f0)] bg-[var(--card,_#ffffff)] p-4 shadow-sm sm:p-5 text-[var(--card-foreground,_#0f172a)]"
-        >
-          <div className="mb-4 flex items-center gap-2">
-            <SlidersHorizontal className="h-4 w-4 text-[var(--primary,_#2563eb)]" />
-
-            <span className="text-xs font-black uppercase tracking-wide text-[var(--foreground,_#0f172a)]">
-              Find your next driving job
-            </span>
-          </div>
-
-          <div className="grid grid-cols-1 gap-3 md:grid-cols-[1.5fr_1fr_1fr]">
-            {/* Search */}
-            <div className="relative">
-              <Search className="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-[var(--muted-foreground,_#94a3b8)]" />
-
-              <input
-                type="text"
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                placeholder="Search role, company, location or keyword..."
-                className="w-full rounded-xl border border-[var(--border,_#e2e8f0)] bg-[var(--muted,_#f1f5f9)] py-3 pl-10 pr-4 text-xs font-medium text-[var(--foreground,_#0f172a)] outline-none transition placeholder:text-[var(--muted-foreground,_#94a3b8)] focus:border-[var(--primary,_#2563eb)] focus:bg-[var(--card,_#ffffff)] focus:ring-4 focus:ring-[var(--primary,_#2563eb)]/10"
-              />
-            </div>
-
-            {/* Location */}
-            <div className="relative">
-              <MapPin className="pointer-events-none absolute left-3.5 top-1/2 z-10 h-4 w-4 -translate-y-1/2 text-[var(--muted-foreground,_#94a3b8)]" />
-
-              <select
-                value={selectedLocation}
-                onChange={(e) => setSelectedLocation(e.target.value)}
-                className="w-full appearance-none rounded-xl border border-[var(--border,_#e2e8f0)] bg-[var(--muted,_#f1f5f9)] py-3 pl-10 pr-4 text-xs font-bold text-[var(--foreground,_#0f172a)] outline-none transition focus:border-[var(--primary,_#2563eb)] focus:bg-[var(--card,_#ffffff)] focus:ring-4 focus:ring-[var(--primary,_#2563eb)]/10"
-              >
-                {locations.map((location) => (
-                  <option key={location} value={location}>
-                    {location === "All" ? "All Locations" : location}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            {/* License */}
-            <div className="relative">
-              <Car className="pointer-events-none absolute left-3.5 top-1/2 z-10 h-4 w-4 -translate-y-1/2 text-[var(--muted-foreground,_#94a3b8)]" />
-
-              <select
-                value={selectedLicense}
-                onChange={(e) => setSelectedLicense(e.target.value)}
-                className="w-full appearance-none rounded-xl border border-[var(--border,_#e2e8f0)] bg-[var(--muted,_#f1f5f9)] py-3 pl-10 pr-4 text-xs font-bold text-[var(--foreground,_#0f172a)] outline-none transition focus:border-[var(--primary,_#2563eb)] focus:bg-[var(--card,_#ffffff)] focus:ring-4 focus:ring-[var(--primary,_#2563eb)]/10"
-              >
-                {licenseTypes.map((license) => (
-                  <option key={license} value={license}>
-                    {license === "All"
-                      ? "All License Types"
-                      : license === "B"
-                        ? "B - Van / Car"
-                        : license === "C"
-                          ? "C - Heavy Truck"
-                          : license === "CE"
-                            ? "CE - Truck & Trailer"
-                            : license === "D"
-                              ? "D - Bus"
-                              : "Taxi (TKT)"}
-                  </option>
-                ))}
-              </select>
-            </div>
-          </div>
-
-          {/* Active filters */}
-          {(searchTerm ||
-            selectedLocation !== "All" ||
-            selectedLicense !== "All") && (
-            <div className="mt-4 flex flex-wrap items-center gap-2 border-t border-[var(--border,_#e2e8f0)] pt-4">
-              <span className="text-[11px] font-semibold text-[var(--muted-foreground,_#64748b)]">
-                Active filters:
-              </span>
-
-              {searchTerm && (
-                <span className="rounded-lg bg-[var(--muted,_#f1f5f9)] px-2.5 py-1 text-[10px] font-bold text-[var(--foreground,_#0f172a)]">
-                  Search: {searchTerm}
-                </span>
-              )}
-
-              {selectedLocation !== "All" && (
-                <span className="rounded-lg bg-[var(--primary,_#2563eb)]/10 px-2.5 py-1 text-[10px] font-bold text-[var(--primary,_#2563eb)]">
-                  {selectedLocation}
-                </span>
-              )}
-
-              {selectedLicense !== "All" && (
-                <span className="rounded-lg bg-[var(--primary,_#2563eb)]/10 px-2.5 py-1 text-[10px] font-bold text-[var(--primary,_#2563eb)]">
-                  License: {selectedLicense}
-                </span>
-              )}
-
-              <button
-                type="button"
-                onClick={resetFilters}
-                className="ml-auto text-[11px] font-bold text-[var(--primary,_#2563eb)] transition hover:underline"
-              >
-                Reset filters
-              </button>
-            </div>
-          )}
-        </motion.div>
-
-        {/* Result Count */}
-        <div className="mb-4 flex items-center justify-between">
-          <p className="text-xs font-bold text-[var(--muted-foreground,_#64748b)]">
-            <span className="text-[var(--foreground,_#0f172a)]">
-              {filteredJobs.length}
-            </span>{" "}
-            {filteredJobs.length === 1 ? "vacancy" : "vacancies"} available
-          </p>
-
-          <div className="hidden items-center gap-1.5 text-[10px] font-semibold text-[var(--muted-foreground,_#64748b)] sm:flex">
-            <ShieldCheck className="h-3.5 w-3.5 text-emerald-600" />
-            Verified employers
-          </div>
-        </div>
-
-        {/* Job Cards */}
-        <div className="space-y-4">
-          <AnimatePresence mode="popLayout">
-            {filteredJobs.length > 0 ? (
-              filteredJobs.map((job, index) => (
-                <motion.article
-                  key={job.id}
-                  layout
-                  initial={{ opacity: 0, y: 16 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -10 }}
-                  transition={{
-                    duration: 0.3,
-                    delay: index * 0.04,
-                  }}
-                  whileHover={{ y: -2 }}
-                  className="group rounded-2xl border border-[var(--border,_#e2e8f0)] bg-[var(--card,_#ffffff)] p-5 shadow-sm transition-all hover:border-[var(--primary,_#2563eb)]/40 hover:shadow-xl sm:p-6"
-                >
-                  <div className="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
-                    {/* Main Info */}
-                    <div className="min-w-0 flex-1">
-                      {/* Top badges */}
-                      <div className="mb-3 flex flex-wrap items-center gap-2">
-                        <span className="rounded-lg border border-[var(--primary,_#2563eb)]/20 bg-[var(--primary,_#2563eb)]/10 px-2.5 py-1 text-[10px] font-bold text-[var(--primary,_#2563eb)]">
-                          {job.licenseRequired}
-                        </span>
-
-                        <span className="flex items-center gap-1 text-[10px] font-semibold text-[var(--muted-foreground,_#94a3b8)]">
-                          <Calendar className="h-3 w-3" />
-                          {job.postedDate}
-                        </span>
-
-                        <span className="inline-flex items-center gap-1 rounded-lg bg-emerald-50 px-2 py-1 text-[10px] font-bold text-emerald-700 border border-emerald-200">
-                          <ShieldCheck className="h-3 w-3" />
-                          Verified Employer
-                        </span>
-                      </div>
-
-                      {/* Title */}
-                      <h2 className="text-lg font-black tracking-tight text-[var(--card-foreground,_#0f172a)] transition-colors group-hover:text-[var(--primary,_#2563eb)]">
-                        {job.title}
-                      </h2>
-
-                      {/* Meta */}
-                      <div className="mt-2.5 flex flex-wrap items-center gap-x-4 gap-y-2 text-xs font-semibold text-[var(--muted-foreground,_#64748b)]">
-                        <span className="flex items-center gap-1.5">
-                          <Building2 className="h-3.5 w-3.5 text-[var(--muted-foreground,_#94a3b8)]" />
-                          {job.company}
-                        </span>
-
-                        <span className="flex items-center gap-1.5">
-                          <MapPin className="h-3.5 w-3.5 text-[var(--muted-foreground,_#94a3b8)]" />
-                          {job.location}
-                        </span>
-
-                        <span className="flex items-center gap-1.5">
-                          <Clock className="h-3.5 w-3.5 text-[var(--muted-foreground,_#94a3b8)]" />
-                          {job.employmentType}
-                        </span>
-                      </div>
-
-                      {/* Description */}
-                      <p className="mt-3 max-w-3xl text-xs leading-6 text-[var(--muted-foreground,_#64748b)]">
-                        {job.description}
-                      </p>
-
-                      {/* Tags */}
-                      <div className="mt-4 flex flex-wrap gap-1.5">
-                        {job.tags.map((tag) => (
-                          <span
-                            key={tag}
-                            className="rounded-md bg-[var(--muted,_#f1f5f9)] px-2.5 py-1 text-[10px] font-semibold text-[var(--foreground,_#0f172a)]"
-                          >
-                            {tag}
-                          </span>
-                        ))}
-                      </div>
-                    </div>
-
-                    {/* Salary + Action */}
-                    <div className="flex shrink-0 items-center justify-between gap-5 border-t border-[var(--border,_#e2e8f0)] pt-4 lg:min-w-[190px] lg:flex-col lg:items-end lg:border-t-0 lg:pt-0">
-                      <div className="text-left lg:text-right">
-                        <span className="mb-1 flex items-center gap-1 text-[10px] font-bold uppercase tracking-wider text-[var(--muted-foreground,_#94a3b8)] lg:justify-end">
-                          <Banknote className="h-3 w-3" />
-                          Compensation
-                        </span>
-
-                        <p className="text-base font-black text-[var(--primary,_#2563eb)]">
-                          {job.salary}
-                        </p>
-                      </div>
-
-                      <button
-                        type="button"
-                        onClick={() => setAppliedJob(job)}
-                        className="inline-flex items-center gap-1.5 rounded-xl bg-[var(--primary,_#2563eb)] px-4 py-2.5 text-xs font-bold text-[var(--primary-foreground,_#ffffff)] shadow-lg shadow-[var(--primary,_#2563eb)]/20 transition hover:opacity-90 active:scale-[0.97]"
-                      >
-                        Apply Now
-                        <ChevronRight className="h-3.5 w-3.5" />
-                      </button>
-                    </div>
-                  </div>
-                </motion.article>
-              ))
-            ) : (
-              /* Empty State */
-              <motion.div
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="rounded-2xl border border-dashed border-[var(--border,_#cbd5e1)] bg-[var(--card,_#ffffff)] px-6 py-14 text-center"
-              >
-                <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-[var(--muted,_#f1f5f9)] text-[var(--muted-foreground,_#94a3b8)]">
-                  <Briefcase className="h-7 w-7" />
-                </div>
-
-                <h3 className="mt-4 text-sm font-black text-[var(--foreground,_#0f172a)]">
-                  No driving jobs found
-                </h3>
-
-                <p className="mx-auto mt-1.5 max-w-sm text-xs leading-5 text-[var(--muted-foreground,_#64748b)]">
-                  Try changing your search term or removing one of the filters
-                  to discover more vacancies.
-                </p>
-
-                <button
-                  type="button"
-                  onClick={resetFilters}
-                  className="mt-5 rounded-xl bg-[var(--primary,_#2563eb)] px-4 py-2.5 text-xs font-bold text-[var(--primary-foreground,_#ffffff)] shadow-lg transition hover:opacity-90"
-                >
-                  Reset Filters
-                </button>
-              </motion.div>
-            )}
-          </AnimatePresence>
-        </div>
-      </div>
-
-      {/* Application Modal */}
-      <AnimatePresence>
-        {appliedJob && (
+        {!isError && (
           <motion.div
-            className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 backdrop-blur-sm"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            onClick={() => setAppliedJob(null)}
+            initial={{
+              opacity: 0,
+              y: 14,
+            }}
+            animate={{
+              opacity: 1,
+              y: 0,
+            }}
+            transition={{
+              duration: 0.45,
+              delay: 0.08,
+            }}
           >
-            <motion.div
-              initial={{ opacity: 0, scale: 0.95, y: 12 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.95, y: 12 }}
-              transition={{ duration: 0.25 }}
-              onClick={(e) => e.stopPropagation()}
-              className="w-full max-w-md overflow-hidden rounded-3xl border border-[var(--border,_#e2e8f0)] bg-[var(--card,_#ffffff)] text-[var(--card-foreground,_#0f172a)] shadow-2xl"
-            >
-              {/* Modal Header */}
-              <div className="flex items-start justify-between border-b border-[var(--border,_#e2e8f0)] p-5">
-                <div className="flex items-start gap-3">
-                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-emerald-50 text-emerald-600">
-                    <CheckCircle2 className="h-5 w-5" />
-                  </div>
-
-                  <div>
-                    <h3 className="text-sm font-black text-[var(--foreground,_#0f172a)]">
-                      Application Submitted
-                    </h3>
-
-                    <p className="mt-1 text-[11px] text-[var(--muted-foreground,_#64748b)]">
-                      Your driver profile has been shared.
-                    </p>
-                  </div>
-                </div>
-
-                <button
-                  type="button"
-                  onClick={() => setAppliedJob(null)}
-                  className="rounded-full p-2 text-[var(--muted-foreground,_#94a3b8)] transition hover:bg-[var(--muted,_#f1f5f9)] hover:text-[var(--foreground,_#0f172a)]"
-                  aria-label="Close modal"
-                >
-                  <X className="h-4 w-4" />
-                </button>
-              </div>
-
-              {/* Modal Body */}
-              <div className="p-5">
-                <div className="rounded-2xl bg-[var(--muted,_#f1f5f9)] p-4">
-                  <p className="text-[10px] font-bold uppercase tracking-wider text-[var(--muted-foreground,_#94a3b8)]">
-                    Applied Position
-                  </p>
-
-                  <p className="mt-1 text-sm font-black text-[var(--foreground,_#0f172a)]">
-                    {appliedJob.title}
-                  </p>
-
-                  <div className="mt-2 flex flex-wrap gap-x-3 gap-y-1 text-[11px] font-semibold text-[var(--muted-foreground,_#64748b)]">
-                    <span>{appliedJob.company}</span>
-                    <span>•</span>
-                    <span>{appliedJob.location}</span>
-                  </div>
-                </div>
-
-                <p className="mt-4 text-xs leading-6 text-[var(--muted-foreground,_#64748b)]">
-                  Your profile and verified credentials have been transmitted
-                  directly to{" "}
-                  <strong className="text-[var(--foreground,_#0f172a)]">
-                    {appliedJob.company}
-                  </strong>
-                  . Their recruitment or fleet team can contact you through the
-                  platform.
-                </p>
-
-                <div className="mt-5 flex items-start gap-2 rounded-xl border border-[var(--primary,_#2563eb)]/20 bg-[var(--primary,_#2563eb)]/10 p-3">
-                  <ShieldCheck className="mt-0.5 h-4 w-4 shrink-0 text-[var(--primary,_#2563eb)]" />
-
-                  <p className="text-[10px] leading-5 text-[var(--primary,_#2563eb)]">
-                    Keep your driver profile and license information updated to
-                    improve your chances of being contacted by employers.
-                  </p>
-                </div>
-              </div>
-
-              {/* Modal Footer */}
-              <div className="border-t border-[var(--border,_#e2e8f0)] bg-[var(--muted,_#f8fafc)]/50 p-5">
-                <button
-                  type="button"
-                  onClick={() => setAppliedJob(null)}
-                  className="w-full rounded-xl bg-[var(--primary,_#2563eb)] py-3 text-xs font-bold text-[var(--primary-foreground,_#ffffff)] shadow-lg transition hover:opacity-90"
-                >
-                  Done
-                </button>
-              </div>
-            </motion.div>
+            {/* <JobFilters
+              searchTerm={searchTerm}
+              selectedLocation={selectedLocation}
+              selectedLicense={selectedLicense}
+              locations={locations}
+              licenseTypes={licenseTypes}
+              onSearchChange={setSearchTerm}
+              onLocationChange={setSelectedLocation}
+              onLicenseChange={setSelectedLicense}
+              onReset={resetFilters}
+            /> */}
           </motion.div>
         )}
-      </AnimatePresence>
+
+        {isError && (
+          <div
+            className="
+              rounded-2xl
+              border
+              border-red-200
+              bg-red-50
+              px-6
+              py-12
+              text-center
+            "
+          >
+            <div
+              className="
+                mx-auto
+                flex
+                h-12
+                w-12
+                items-center
+                justify-center
+                rounded-xl
+                bg-red-100
+                text-red-600
+              "
+            >
+              <AlertCircle className="h-6 w-6" />
+            </div>
+
+            <h3
+              className="
+                mt-4
+                text-sm
+                font-black
+                text-red-900
+              "
+            >
+              Unable to load jobs
+            </h3>
+
+            <p
+              className="
+                mx-auto
+                mt-1
+                max-w-md
+                text-xs
+                leading-5
+                text-red-600
+              "
+            >
+              {error instanceof Error
+                ? error.message
+                : "Something went wrong while loading jobs."}
+            </p>
+
+            <button
+              type="button"
+              onClick={() => refetch()}
+              className="
+                mt-5
+                inline-flex
+                cursor-pointer
+                items-center
+                gap-2
+                rounded-xl
+                bg-red-600
+                px-4
+                py-2.5
+                text-xs
+                font-bold
+                text-white
+              "
+            >
+              <RefreshCw className="h-3.5 w-3.5" />
+              Try Again
+            </button>
+          </div>
+        )}
+
+        {isLoading && (
+          <>
+            <div
+              className="
+                mb-4
+                h-4
+                w-32
+                animate-pulse
+                rounded
+                bg-slate-200
+              "
+            />
+
+            <div className="space-y-4">
+              {[1, 2, 3].map((item) => (
+                <JobCardSkeleton key={item} />
+              ))}
+            </div>
+          </>
+        )}
+
+        {!isLoading && !isError && (
+          <>
+            {/* RESULT COUNT */}
+
+            <div
+              className="
+                  mb-4
+                  flex
+                  items-center
+                  justify-between
+                "
+            >
+              <div>
+                <p
+                  className="
+                      text-xs
+                      font-bold
+                      text-[var(--muted-foreground,_#64748b)]
+                    "
+                >
+                  <span
+                    className="
+                        text-[var(--foreground,_#0f172a)]
+                      "
+                  >
+                    {filteredJobs.length}
+                  </span>{" "}
+                  {filteredJobs.length === 1 ? "vacancy" : "vacancies"}{" "}
+                  available
+                </p>
+
+                {filteredJobs.length !== jobs.length && (
+                  <p
+                    className="
+                        mt-1
+                        text-[10px]
+                        text-[var(--muted-foreground,_#94a3b8)]
+                      "
+                  >
+                    Filtered from {jobs.length} total jobs
+                  </p>
+                )}
+              </div>
+
+              <div
+                className="
+                    hidden
+                    items-center
+                    gap-3
+
+                    sm:flex
+                  "
+              >
+                {isFetching && (
+                  <span
+                    className="
+                        flex
+                        items-center
+                        gap-1.5
+                        text-[10px]
+                        font-semibold
+                        text-[var(--muted-foreground,_#64748b)]
+                      "
+                  >
+                    <RefreshCw className="h-3 w-3 animate-spin" />
+                    Updating
+                  </span>
+                )}
+
+                <span
+                  className="
+                      flex
+                      items-center
+                      gap-1.5
+                      text-[10px]
+                      font-semibold
+                      text-[var(--muted-foreground,_#64748b)]
+                    "
+                >
+                  <ShieldCheck className="h-3.5 w-3.5 text-emerald-600" />
+                  Verified employers
+                </span>
+              </div>
+            </div>
+
+            {/* JOB CARDS */}
+
+            <div className="space-y-4">
+              <AnimatePresence mode="popLayout">
+                {filteredJobs.length > 0 ? (
+                  filteredJobs.map((job, index) => (
+                    <JobCard
+                      key={job.id}
+                      job={job}
+                      index={index}
+                      onApply={setAppliedJob}
+                    />
+                  ))
+                ) : (
+                  <JobEmptyState key="empty" onReset={resetFilters} />
+                )}
+              </AnimatePresence>
+            </div>
+          </>
+        )}
+      </div>
+
+      <JobApplicationModal
+        job={appliedJob}
+        onClose={() => setAppliedJob(null)}
+      />
     </main>
   );
 }
