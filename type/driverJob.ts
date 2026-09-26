@@ -22,6 +22,8 @@ export interface DriverJob {
   requirements: string | null;
   requiresTKT: boolean;
   hrId: number;
+  isDirectOffer?: boolean;
+  assignedDriverId?: number | null;
   createdAt: string;
   updatedAt: string;
   hr: DriverJobHR;

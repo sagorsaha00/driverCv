@@ -4,14 +4,14 @@ import {
   MarketplaceSearchResponse,
   SearchParams,
 } from "@/type/search";
-import { Driver, DriverFilterOptions, DriverPaginationMeta } from "@/type/driver";
+import {
+  Driver,
+  DriverFilterOptions,
+  DriverPaginationMeta,
+} from "@/type/driver";
 
-const API_URL =
-  process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:5000/api/v1";
-
-const BASE_URL =
-  process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:5000";
-
+const API_URL = process.env.NEXT_PUBLIC_API_URL;
+const BASE_URL = process.env.NEXT_PUBLIC_API_URL;
 export interface DynamicDriverSearchResult {
   drivers: Driver[];
   allDrivers: Driver[];
@@ -29,15 +29,27 @@ export const searchService = {
     const searchParams = new URLSearchParams();
 
     if (params.q) searchParams.set("q", params.q);
-    if (params.location && params.location !== "All" && params.location !== "All Regions") {
+    if (
+      params.location &&
+      params.location !== "All" &&
+      params.location !== "All Regions"
+    ) {
       searchParams.set("location", params.location);
     }
     if (params.posted) searchParams.set("posted", params.posted);
     if (params.type) searchParams.set("type", params.type);
-    if (params.category && params.category !== "All" && params.category !== "All Categories") {
+    if (
+      params.category &&
+      params.category !== "All" &&
+      params.category !== "All Categories"
+    ) {
       searchParams.set("category", params.category);
     }
-    if (params.workingHours && params.workingHours !== "All" && params.workingHours !== "All Hours") {
+    if (
+      params.workingHours &&
+      params.workingHours !== "All" &&
+      params.workingHours !== "All Hours"
+    ) {
       searchParams.set("workingHours", params.workingHours);
     }
     if (params.page) searchParams.set("page", String(params.page));
@@ -82,7 +94,9 @@ export const searchService = {
    * Dynamic search specifically for ExploreDrivers
    * Integrates live backend /search and /api/driver/allData
    */
-  async getExploreDrivers(params: SearchParams = {}): Promise<DynamicDriverSearchResult> {
+  async getExploreDrivers(
+    params: SearchParams = {},
+  ): Promise<DynamicDriverSearchResult> {
     const page = Math.max(1, params.page || 1);
     const limit = Math.max(1, params.limit || 9);
 
@@ -109,7 +123,11 @@ export const searchService = {
         }
       } else {
         // Fallback to /search?type=drivers
-        const searchRes = await this.search({ ...params, type: "drivers", limit: 100 });
+        const searchRes = await this.search({
+          ...params,
+          type: "drivers",
+          limit: 100,
+        });
         driversList = (searchRes.data?.drivers || []) as unknown as Driver[];
       }
 
@@ -159,12 +177,21 @@ export const searchService = {
 
       // Salary
       if (typeof driver.targetMonthlySalary === "number") {
-        if (driver.targetMonthlySalary < minSalary) minSalary = driver.targetMonthlySalary;
-        if (driver.targetMonthlySalary > maxSalary) maxSalary = driver.targetMonthlySalary;
+        if (driver.targetMonthlySalary < minSalary)
+          minSalary = driver.targetMonthlySalary;
+        if (driver.targetMonthlySalary > maxSalary)
+          maxSalary = driver.targetMonthlySalary;
       }
     });
 
-    const standardCategories = ["Car", "Motorcycle", "Heavy Truck", "Delivery Van", "Bus & Coach", "Personal Chauffeur"];
+    const standardCategories = [
+      "Car",
+      "Motorcycle",
+      "Heavy Truck",
+      "Delivery Van",
+      "Bus & Coach",
+      "Personal Chauffeur",
+    ];
     standardCategories.forEach((cat) => categoriesSet.add(cat));
 
     const filterOptions: DriverFilterOptions = {
@@ -187,33 +214,63 @@ export const searchService = {
         const licenseMatch = d.drivingLicenseNumber?.toLowerCase().includes(q);
         const nidMatch = d.personalIdentityNumber?.includes(q);
         const regionMatch = d.regions?.some((r) => r.toLowerCase().includes(q));
-        const categoryMatch = d.licenseCategories?.some((c) => c.toLowerCase().includes(q));
-        return nameMatch || emailMatch || phoneMatch || licenseMatch || nidMatch || regionMatch || categoryMatch;
+        const categoryMatch = d.licenseCategories?.some((c) =>
+          c.toLowerCase().includes(q),
+        );
+        return (
+          nameMatch ||
+          emailMatch ||
+          phoneMatch ||
+          licenseMatch ||
+          nidMatch ||
+          regionMatch ||
+          categoryMatch
+        );
       });
     }
 
-    if (params.location && params.location !== "All Regions" && params.location !== "All") {
+    if (
+      params.location &&
+      params.location !== "All Regions" &&
+      params.location !== "All"
+    ) {
       filtered = filtered.filter((d) =>
-        d.regions?.some((r) => r.toLowerCase() === params.location!.toLowerCase())
+        d.regions?.some(
+          (r) => r.toLowerCase() === params.location!.toLowerCase(),
+        ),
       );
     }
 
-    if (params.category && params.category !== "All Categories" && params.category !== "All") {
+    if (
+      params.category &&
+      params.category !== "All Categories" &&
+      params.category !== "All"
+    ) {
       filtered = filtered.filter((d) =>
-        d.licenseCategories?.some((c) => c.toLowerCase() === params.category!.toLowerCase())
+        d.licenseCategories?.some(
+          (c) => c.toLowerCase() === params.category!.toLowerCase(),
+        ),
       );
     }
 
-    if (params.workingHours && params.workingHours !== "All Hours" && params.workingHours !== "All") {
+    if (
+      params.workingHours &&
+      params.workingHours !== "All Hours" &&
+      params.workingHours !== "All"
+    ) {
       filtered = filtered.filter((d) => d.workingHours === params.workingHours);
     }
 
     if (typeof params.minSalary === "number" && params.minSalary > 0) {
-      filtered = filtered.filter((d) => d.targetMonthlySalary >= params.minSalary!);
+      filtered = filtered.filter(
+        (d) => d.targetMonthlySalary >= params.minSalary!,
+      );
     }
 
     if (typeof params.maxSalary === "number" && params.maxSalary > 0) {
-      filtered = filtered.filter((d) => d.targetMonthlySalary <= params.maxSalary!);
+      filtered = filtered.filter(
+        (d) => d.targetMonthlySalary <= params.maxSalary!,
+      );
     }
 
     // Sort

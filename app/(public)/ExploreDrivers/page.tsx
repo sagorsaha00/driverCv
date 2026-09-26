@@ -181,7 +181,7 @@ export default function DriverExplorer() {
               <div>
                 <p className="text-xs font-bold">Failed to connect to backend server</p>
                 <p className="text-[11px] text-red-600">
-                  {error instanceof Error ? error.message : "Please ensure http://localhost:5000 is active."}
+                  {error instanceof Error ? error.message : "Please ensure server is active."}
                 </p>
               </div>
             </div>

@@ -43,11 +43,13 @@ export default function HRDashboard({ onShowToast }: HRDashboardProps) {
   const { drivers: liveDrivers = [], isLoading: loadingDrivers } = useDrivers({ limit: 50 });
   const { data: hrJobs = [], isLoading: loadingHrJobs } = useHrJobs(hrId);
   const { data: allLiveJobsResponse } = useDriverJobs();
-  const allLiveJobs: DriverJob[] = Array.isArray(allLiveJobsResponse)
-    ? (allLiveJobsResponse as DriverJob[])
-    : Array.isArray(allLiveJobsResponse?.jobs)
-    ? (allLiveJobsResponse.jobs as DriverJob[])
-    : [];
+  const allLiveJobs: DriverJob[] = (
+    Array.isArray(allLiveJobsResponse)
+      ? (allLiveJobsResponse as DriverJob[])
+      : Array.isArray(allLiveJobsResponse?.jobs)
+      ? (allLiveJobsResponse.jobs as DriverJob[])
+      : []
+  ).filter((j: any) => !j.isDirectOffer && !j.assignedDriverId);
   const { data: sentMessages = [], isLoading: loadingMessages } = useHrMessages(hrId);
 
   const displayedJobs: DriverJob[] = hrJobs.length > 0 ? hrJobs : allLiveJobs;

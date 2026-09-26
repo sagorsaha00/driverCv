@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { useDriverJob } from "@/lib/api/apiCall";
 import {
   ArrowLeft,
@@ -8,12 +9,15 @@ import {
   CalendarDays,
   Car,
   Clock,
+  Lock,
+  LogIn,
   MapPin,
   RefreshCw,
   ShieldCheck,
 } from "lucide-react";
 
 import { useRouter } from "next/navigation";
+import { useAuthStore } from "@/store/authStore";
 import { EmployerContactCard } from "./EmployerContactCard";
 
 interface Props {
@@ -22,8 +26,51 @@ interface Props {
 
 export default function JobDetails({ jobId }: Props) {
   const router = useRouter();
+  const [mounted, setMounted] = useState(false);
+  const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const { data, isLoading, isError, refetch } = useDriverJob(jobId);
+
+  // AUTHENTICATION GATE
+  if (mounted && !isAuthenticated) {
+    return (
+      <main className="min-h-screen flex items-center justify-center bg-[var(--background,_#f8fafc)] px-4 py-16 text-center">
+        <div className="max-w-md w-full rounded-3xl border border-[var(--border,_#e2e8f0)] bg-white p-8 shadow-sm">
+          <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-[var(--primary,_#2563eb)]/10 text-[var(--primary,_#2563eb)]">
+            <Lock className="h-7 w-7" />
+          </div>
+          <h2 className="mt-4 text-lg font-black text-[var(--foreground,_#0f172a)]">
+            Login Required
+          </h2>
+          <p className="mt-2 text-xs text-[var(--muted-foreground,_#64748b)] leading-relaxed">
+            Please log in to your account to view this job vacancy&apos;s full requirements, salary breakdown, and direct employer contact details.
+          </p>
+          <div className="mt-6 flex flex-col gap-2.5">
+            <button
+              type="button"
+              onClick={() => router.push(`/login?redirect=/EmployerJobFeed/${jobId}`)}
+              className="w-full inline-flex cursor-pointer items-center justify-center gap-2 rounded-xl bg-[var(--primary,_#2563eb)] px-5 py-3 text-xs font-bold text-white shadow-xs transition hover:opacity-90 active:scale-95"
+            >
+              <LogIn className="h-4 w-4" />
+              <span>Log In to View Job Details</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => router.push("/EmployerJobFeed")}
+              className="w-full inline-flex cursor-pointer items-center justify-center gap-2 rounded-xl border border-[var(--border,_#e2e8f0)] bg-slate-50 px-4 py-2.5 text-xs font-semibold text-[var(--foreground,_#0f172a)] transition hover:bg-slate-100"
+            >
+              <ArrowLeft className="h-3.5 w-3.5" />
+              <span>Back to Driving Jobs</span>
+            </button>
+          </div>
+        </div>
+      </main>
+    );
+  }
 
   // LOADING
   if (isLoading) {

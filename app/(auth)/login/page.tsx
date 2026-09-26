@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { Suspense, useState } from "react";
 import { motion } from "framer-motion";
 import Link from "next/link";
 import axios from "axios";
@@ -18,7 +18,7 @@ import {
   Loader2,
 } from "lucide-react";
 
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 
 import { useAuthStore } from "@/store/authStore";
 
@@ -26,8 +26,9 @@ import type { UserRole } from "@/type/auth";
 import { useLoginDriver, useLoginHR } from "@/lib/api/apiCall";
 import { validateLoginIdentifier } from "@/lib/utils/validation";
 
-export default function LoginPage() {
+function LoginContent() {
   const router = useRouter();
+  const searchParams = useSearchParams();
 
   // ============================================
   // STATE
@@ -79,12 +80,14 @@ export default function LoginPage() {
         password,
       };
 
+      const redirectTarget = searchParams?.get("redirect") || "/dashboard";
+
       if (role === "driver") {
         const response = await driverLogin.mutateAsync(payload);
 
         setAuth(response.driver, "driver");
 
-        router.replace("/dashboard");
+        router.replace(redirectTarget);
 
         return;
       }
@@ -93,7 +96,7 @@ export default function LoginPage() {
 
       setAuth(response.hr, "hr");
 
-      router.replace("/dashboard");
+      router.replace(redirectTarget);
     } catch (error: unknown) {
       console.error("Login error:", error);
 
@@ -669,3 +672,12 @@ function RoleButton({
     </button>
   );
 }
+
+export default function LoginPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-[#F6F7F4]" />}>
+      <LoginContent />
+    </Suspense>
+  );
+}
+

@@ -34,7 +34,10 @@ export default function EmployerJobFeed() {
   const { data, isLoading, isFetching, isError, error, refetch } =
     useDriverJobs();
 
-  const jobs = data?.jobs ?? [];
+  const jobs = useMemo(() => {
+    const raw = data?.jobs ?? (Array.isArray(data) ? (data as DriverJob[]) : []);
+    return raw.filter((job) => !job.isDirectOffer && !job.assignedDriverId);
+  }, [data]);
 
   const locations = useMemo(() => {
     return Array.from(

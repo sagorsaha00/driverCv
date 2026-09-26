@@ -6,6 +6,7 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import {
   Briefcase,
+  Building2,
   Car,
   ChevronDown,
   ChevronRight,
@@ -106,6 +107,13 @@ export default function Navbar() {
       icon: Briefcase,
     });
   }
+
+  // Companies Directory
+  navLinks.push({
+    name: "Companies",
+    href: "/Companies",
+    icon: Building2,
+  });
 
   // Dashboard for logged in users
   if (isAuthenticated) {

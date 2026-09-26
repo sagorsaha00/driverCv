@@ -33,6 +33,8 @@ import {
 } from "@/lib/hook/useDashboard";
 import { useDriverJobs } from "@/lib/api/apiCall";
 import { DriverJob } from "@/type/job";
+import { DriverNotification } from "@/type/dashboard";
+import InvitationJobDetailsModal from "./InvitationJobDetailsModal";
 
 interface DriverDashboardProps {
   onShowToast: (msg: string) => void;
@@ -71,11 +73,13 @@ export default function DriverDashboard({ onShowToast }: DriverDashboardProps) {
   const { data: messages = [], isLoading: loadingMessages } = useDriverMessages(driverId);
   const { data: notifications = [], isLoading: loadingNotifications } = useDriverNotifications(driverId);
   const { data: jobsResponse, isLoading: loadingJobs } = useDriverJobs();
-  const liveJobs: DriverJob[] = Array.isArray(jobsResponse)
-    ? jobsResponse
-    : Array.isArray(jobsResponse?.jobs)
-    ? jobsResponse.jobs
-    : [];
+  const liveJobs: DriverJob[] = (
+    Array.isArray(jobsResponse)
+      ? jobsResponse
+      : Array.isArray(jobsResponse?.jobs)
+      ? jobsResponse.jobs
+      : []
+  ).filter((j: any) => !j.isDirectOffer && !j.assignedDriverId);
 
   const markMessageReadMutation = useMarkMessageRead();
   const markNotificationReadMutation = useMarkNotificationRead();
@@ -86,6 +90,9 @@ export default function DriverDashboard({ onShowToast }: DriverDashboardProps) {
 
   // Job Search / Filter
   const [searchQuery, setSearchQuery] = useState("");
+
+  // Selected Notification for Full Details View Modal
+  const [selectedNotifForModal, setSelectedNotifForModal] = useState<DriverNotification | null>(null);
 
   // Profile Edit Form State
   const [editForm, setEditForm] = useState({
@@ -513,8 +520,10 @@ export default function DriverDashboard({ onShowToast }: DriverDashboardProps) {
                     <button
                       type="button"
                       onClick={() => {
-                        setActiveTab("jobs");
-                        onShowToast("Showing available jobs.");
+                        setSelectedNotifForModal(notif);
+                        if (!notif.isRead) {
+                          markNotificationReadMutation.mutate(notif.id);
+                        }
                       }}
                       className="rounded-2xl bg-primary px-5 py-2.5 text-xs font-black text-white hover:bg-primary-hover shadow-sm cursor-pointer"
                     >
@@ -799,6 +808,17 @@ export default function DriverDashboard({ onShowToast }: DriverDashboardProps) {
             </div>
           </form>
         </div>
+      )}
+
+      {/* Modal for Full Invitation / Job Details */}
+      {selectedNotifForModal && (
+        <InvitationJobDetailsModal
+          notification={selectedNotifForModal}
+          onClose={() => setSelectedNotifForModal(null)}
+          onAccept={(title, comp) => {
+            onShowToast(`Accepted offer for ${title} from ${comp}! Employer will contact you.`);
+          }}
+        />
       )}
     </div>
   );

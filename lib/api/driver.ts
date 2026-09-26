@@ -3,14 +3,14 @@ import { searchService, DynamicDriverSearchResult } from "@/lib/api/search";
 
 export type FetchDriversResult = DynamicDriverSearchResult;
 
-const API_BASE_URL =
-  process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
-
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL;
 export const driverService = {
   /**
    * Fetches dynamic driver data and dynamic locations using searchService
    */
-  async getAllDrivers(params: DriverFilterParams = {}): Promise<FetchDriversResult> {
+  async getAllDrivers(
+    params: DriverFilterParams = {},
+  ): Promise<FetchDriversResult> {
     return searchService.getExploreDrivers({
       q: params.search,
       location: params.region,
@@ -24,18 +24,17 @@ export const driverService = {
     });
   },
 
-  /**
-   * Fetches single driver profile data:
-   * http://localhost:5000/api/driver/driverSingleData/:id
-   */
   async getSingleDriver(id: string | number): Promise<Driver> {
-    const res = await fetch(`${API_BASE_URL}/api/driver/driverSingleData/${id}`, {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
+    const res = await fetch(
+      `${API_BASE_URL}/api/driver/driverSingleData/${id}`,
+      {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        cache: "no-store",
       },
-      cache: "no-store",
-    });
+    );
 
     if (!res.ok) {
       throw new Error(`Failed to fetch driver details (${res.status})`);
