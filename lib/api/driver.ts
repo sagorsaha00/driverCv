@@ -3,7 +3,7 @@ import { searchService, DynamicDriverSearchResult } from "@/lib/api/search";
 
 export type FetchDriversResult = DynamicDriverSearchResult;
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL;
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
 export const driverService = {
   /**
    * Fetches dynamic driver data and dynamic locations using searchService

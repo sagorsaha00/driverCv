@@ -8,7 +8,7 @@ import {
 import { Driver } from "@/type/auth";
 import { DriverJob } from "@/type/job";
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL  
+const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
 const api = axios.create({
   baseURL: API_URL,
   headers: {

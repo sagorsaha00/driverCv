@@ -10,8 +10,8 @@ import {
   DriverPaginationMeta,
 } from "@/type/driver";
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL;
-const BASE_URL = process.env.NEXT_PUBLIC_API_URL;
+const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
+const BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
 export interface DynamicDriverSearchResult {
   drivers: Driver[];
   allDrivers: Driver[];
