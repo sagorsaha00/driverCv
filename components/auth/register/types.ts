@@ -14,6 +14,10 @@ export interface DriverFormData {
   certificates: string;
 
   ProfileImage: string;
+  vehicleTypes: string[];
+  weekendAvailable: boolean;
+  hasYKB: boolean;
+  hasDigitalTacho: boolean;
 }
 
 export interface HRFormData {

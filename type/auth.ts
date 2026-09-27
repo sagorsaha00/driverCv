@@ -13,6 +13,7 @@ export interface DriverRegisterPayload {
   personalIdentityNumber: string;
   drivingLicenseNumber: string;
   certificates?: string | null;
+  vehicleTypes?: string[];
 }
 
 export interface HRRegisterPayload {
@@ -37,6 +38,7 @@ export interface Driver {
   personalIdentityNumber: string;
   drivingLicenseNumber: string;
   certificates?: string | null;
+  vehicleTypes?: string[];
   role: "driver";
 }
 

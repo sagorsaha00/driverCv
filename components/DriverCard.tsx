@@ -15,6 +15,7 @@ import { useState } from "react";
 import { motion } from "framer-motion";
 import { useRouter } from "next/navigation";
 import { Driver as RealDriver } from "@/type/driver";
+import { getDriverRoleTitle } from "@/lib/utils/driverTitle";
 
 export interface DriverCompat {
   id: number;
@@ -52,15 +53,11 @@ export default function DriverCard({
     (driver.regions && driver.regions.length > 0 ? driver.regions.join(", ") : null) ||
     (driver as DriverCompat).location ||
     "Nationwide";
-  const displayRole =
-    driver.role ||
-    (driver.licenseCategories && driver.licenseCategories.length > 0
-      ? driver.licenseCategories.join(" & ")
-      : "Commercial Driver");
+  const displayRole = getDriverRoleTitle(driver as any);
   const displayPhone = driver.phonenumber || (driver as DriverCompat).phone || "";
   const displayHours = driver.workingHours || "8 Hours / Day";
   const displaySalary = driver.targetMonthlySalary
-    ? `৳${Number(driver.targetMonthlySalary).toLocaleString()}/mo`
+    ? `${Number(driver.targetMonthlySalary).toLocaleString()} kr / mo`
     : null;
 
   const initials =

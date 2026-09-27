@@ -29,6 +29,7 @@ import { useSingleDriver } from "@/lib/hook/useDrivers";
 import { useAuthStore } from "@/store/authStore";
 import HireDriverModal from "@/components/drivers/HireDriverModal";
 import MessageDriverModal from "@/components/drivers/MessageDriverModal";
+import { getDriverRoleTitle } from "@/lib/utils/driverTitle";
 
 export default function DriverProfileView() {
   const router = useRouter();
@@ -270,8 +271,8 @@ export default function DriverProfileView() {
                   </span>
                 </div>
 
-                <p className="mt-1 text-xs font-semibold capitalize text-[var(--text-muted)] sm:text-sm">
-                  {driver.role || "Professional Driver"}
+                <p className="mt-1 text-xs font-semibold capitalize text-primary sm:text-sm">
+                  {getDriverRoleTitle(driver)}
                 </p>
 
                 <div className="mt-2.5 flex flex-wrap items-center gap-3 text-xs text-[var(--text-subtle)]">
@@ -361,7 +362,7 @@ export default function DriverProfileView() {
               </div>
             </div>
             <p className="mt-2 text-2xl font-black text-[var(--text)]">
-              ৳{formattedSalary}
+              {formattedSalary} kr
             </p>
             <p className="mt-1 text-xs text-[var(--text-muted)]">Per month target</p>
           </div>

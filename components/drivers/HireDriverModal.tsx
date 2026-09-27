@@ -260,7 +260,7 @@ export default function HireDriverModal({ driver, onClose }: Props) {
                     Expected Salary
                   </span>
                   <p className="font-bold text-text">
-                    ৳{Number(driver.targetMonthlySalary || 0).toLocaleString()} / mo
+                    {Number(driver.targetMonthlySalary || 0).toLocaleString()} kr / mo
                   </p>
                 </div>
                 <div>

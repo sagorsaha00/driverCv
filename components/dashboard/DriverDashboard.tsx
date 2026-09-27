@@ -35,6 +35,7 @@ import { useDriverJobs } from "@/lib/api/apiCall";
 import { DriverJob } from "@/type/job";
 import { DriverNotification } from "@/type/dashboard";
 import InvitationJobDetailsModal from "./InvitationJobDetailsModal";
+import { getDriverRoleTitle } from "@/lib/utils/driverTitle";
 
 interface DriverDashboardProps {
   onShowToast: (msg: string) => void;
@@ -218,7 +219,7 @@ export default function DriverDashboard({ onShowToast }: DriverDashboardProps) {
                 {editForm.fullname}
               </h2>
               <span className="rounded-full bg-green-100 px-3 py-1 text-xs font-bold text-green-800">
-                Verified Driver
+                {getDriverRoleTitle(driverData)}
               </span>
             </div>
             <p className="text-sm text-text-muted mt-1">

@@ -51,6 +51,15 @@ export default function DriverRegisterForm({ step, setStep }: Props) {
 
   const handleSubmit = async () => {
     try {
+      // Assemble full certificates string so it never saves as null when qualifications are selected
+      const certsList: string[] = [];
+      if (data.hasYKB) certsList.push("YKB (Professional Driver Qualification)");
+      if (data.hasDigitalTacho) certsList.push("Digital Tachograph Card");
+      if (data.certificates && data.certificates.trim()) {
+        certsList.push(data.certificates.trim());
+      }
+      const finalCertificates = certsList.length > 0 ? certsList.join(", ") : null;
+
       const payload = {
         fullname: data.fullname,
         email: data.email,
@@ -63,7 +72,8 @@ export default function DriverRegisterForm({ step, setStep }: Props) {
         regions: data.regions,
         personalIdentityNumber: data.personalIdentityNumber,
         drivingLicenseNumber: data.drivingLicenseNumber,
-        certificates: data.certificates || null,
+        certificates: finalCertificates,
+        vehicleTypes: data.vehicleTypes || [],
       };
 
       const driver = await mutation.mutateAsync(payload);

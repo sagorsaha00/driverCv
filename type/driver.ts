@@ -11,6 +11,7 @@ export interface Driver {
   personalIdentityNumber?: string;
   drivingLicenseNumber?: string;
   certificates?: string | null;
+  vehicleTypes?: string[];
   role: string;
 }
 

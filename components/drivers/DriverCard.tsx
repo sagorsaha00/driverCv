@@ -18,6 +18,7 @@ import {
 } from "lucide-react";
 import { motion } from "framer-motion";
 import { Driver } from "@/type/driver";
+import { getDriverRoleTitle } from "@/lib/utils/driverTitle";
 
 type Props = {
   driver: Driver;
@@ -128,7 +129,7 @@ export default function DriverCard({
               </span>
               <span>•</span>
               <span className="font-semibold text-primary">
-                ৳{formattedSalary}/mo
+                {formattedSalary} kr / mo
               </span>
             </div>
 
@@ -265,8 +266,8 @@ export default function DriverCard({
               >
                 {driver.fullname}
               </h3>
-              <p className="mt-0.5 truncate text-[11px] font-medium capitalize text-text-subtle">
-                {driver.role || "Professional Driver"}
+              <p className="mt-0.5 truncate text-[11px] font-semibold text-primary">
+                {getDriverRoleTitle(driver)}
               </p>
             </div>
           </div>
@@ -371,7 +372,7 @@ export default function DriverCard({
             </span>
           </div>
           <span className="text-xs font-bold text-text">
-            ৳{formattedSalary}{" "}
+            {formattedSalary} kr{" "}
             <span className="text-[10px] font-normal text-text-subtle">/ mo</span>
           </span>
         </div>

@@ -234,8 +234,8 @@ export default function DriverFilters({
       <FilterGroup title="Target Monthly Salary">
         <div className="space-y-3">
           <div className="flex items-center justify-between text-xs font-semibold text-[var(--text)]">
-            <span>Min: ৳{salaryRange[0].toLocaleString()}</span>
-            <span>Max: ৳{salaryRange[1].toLocaleString()}</span>
+            <span>Min: {salaryRange[0].toLocaleString()} kr</span>
+            <span>Max: {salaryRange[1].toLocaleString()} kr</span>
           </div>
 
           <input

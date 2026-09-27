@@ -1,0 +1,437 @@
+{
+  "info": {
+    "_postman_id": "e98e4f12-9c1a-4712-8812-7f918e6900a1",
+    "name": "DriverCV API Collection",
+    "description": "Complete REST API collection for DriverCV backend (Authentication, Drivers, HR Companies, Jobs, Personal Offers, Messaging, Notifications, and Search).",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:5000",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "1. Driver Endpoints",
+      "item": [
+        {
+          "name": "Register Driver",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"fullname\": \"Mohammad Easin\",\n  \"email\": \"easin.driver@example.com\",\n  \"phonenumber\": \"+46 70 123 45 67\",\n  \"ProfileImage\": \"https://images.unsplash.com/photo-1534528741775-53994a69daeb\",\n  \"password\": \"DriverPass123!\",\n  \"workingHours\": \"8 Hours\",\n  \"licenseCategories\": [\"Class B\", \"Class C (Truck)\"],\n  \"targetMonthlySalary\": 35000,\n  \"regions\": [\"Stockholm\", \"Uppsala\"],\n  \"personalIdentityNumber\": \"19900101-1234\",\n  \"drivingLicenseNumber\": \"SE-12345678\",\n  \"certificates\": \"https://example.com/certificates/c-license.pdf\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/driver/driverRegister",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "driver", "driverRegister"]
+            }
+          }
+        },
+        {
+          "name": "Login Driver (Email or Phone)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"easin.driver@example.com\",\n  \"password\": \"DriverPass123!\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/driver/driverlogin",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "driver", "driverlogin"]
+            }
+          }
+        },
+        {
+          "name": "Get All Drivers",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/driver/allData",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "driver", "allData"]
+            }
+          }
+        },
+        {
+          "name": "Get Single Driver Profile by ID",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/driver/driverSingleData/1",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "driver", "driverSingleData", "1"]
+            }
+          }
+        },
+        {
+          "name": "Update Driver Profile",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"fullname\": \"Mohammad Easin (Updated)\",\n  \"phonenumber\": \"+46 70 999 88 77\",\n  \"targetMonthlySalary\": 38000,\n  \"workingHours\": \"8 Hours\",\n  \"licenseCategories\": [\"Class B\", \"Class C (Truck)\", \"Class CE (Heavy Combo)\"],\n  \"regions\": [\"Stockholm\", \"Gothenburg\"]\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/driver/1",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "driver", "1"]
+            }
+          }
+        },
+        {
+          "name": "Delete Driver",
+          "request": {
+            "method": "DELETE",
+            "url": {
+              "raw": "{{baseUrl}}/api/driver/1",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "driver", "1"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "2. HR & Company Endpoints",
+      "item": [
+        {
+          "name": "Register HR / Company",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Anna Lindqvist\",\n  \"companyName\": \"Nordic Express Logistics AB\",\n  \"organizationNumber\": \"556677-8899\",\n  \"email\": \"recruiter@nordicexpress.se\",\n  \"phoneNumber\": \"+46 8 123 456 00\",\n  \"password\": \"CompanyPass123!\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/hr/hrRegister",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "hr", "hrRegister"]
+            }
+          }
+        },
+        {
+          "name": "Login HR / Company",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"recruiter@nordicexpress.se\",\n  \"password\": \"CompanyPass123!\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/hr/hrLogin",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "hr", "hrLogin"]
+            }
+          }
+        },
+        {
+          "name": "Get All Companies (HRs)",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/hr/allHrData",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "hr", "allHrData"]
+            }
+          }
+        },
+        {
+          "name": "Get Single Company by ID",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/hr/singleHrData/1",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "hr", "singleHrData", "1"]
+            }
+          }
+        },
+        {
+          "name": "Update Company Data",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Anna Lindqvist\",\n  \"companyName\": \"Nordic Express Fleet AB\",\n  \"phoneNumber\": \"+46 8 987 654 00\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/hr/updateHrData/1",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "hr", "updateHrData", "1"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "3. Driving Jobs & Direct Offers",
+      "item": [
+        {
+          "name": "Create Public Driving Job",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"jobTitle\": \"Heavy Truck Long Haul Driver\",\n  \"vehicleRequired\": \"Class C (Truck)\",\n  \"employmentType\": \"Full-time\",\n  \"workingHours\": \"8 Hours / Day\",\n  \"salaryType\": \"monthly\",\n  \"salaryAmount\": \"36000 SEK\",\n  \"location\": \"Stockholm\",\n  \"jobDescription\": \"We are looking for an experienced commercial truck driver for intercity transport.\",\n  \"requirements\": \"Clean driving record, YKB/CPC certification\",\n  \"requiresTKT\": false,\n  \"hrId\": 1,\n  \"isDirectOffer\": false,\n  \"assignedDriverId\": null\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/driverJob/createDriverJob",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "driverJob", "createDriverJob"]
+            }
+          }
+        },
+        {
+          "name": "Create Direct Personal Offer to Specific Driver",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"jobTitle\": \"Direct Private Delivery Offer\",\n  \"vehicleRequired\": \"Class B Van\",\n  \"employmentType\": \"Contract\",\n  \"workingHours\": \"Flexible 6 Hours\",\n  \"salaryType\": \"monthly\",\n  \"salaryAmount\": \"34000 SEK\",\n  \"location\": \"Stockholm\",\n  \"jobDescription\": \"Direct private invitation sent specifically for your profile qualifications.\",\n  \"requirements\": \"Class B license\",\n  \"requiresTKT\": false,\n  \"hrId\": 1,\n  \"isDirectOffer\": true,\n  \"assignedDriverId\": 1\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/driverJob/createDriverJob",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "driverJob", "createDriverJob"]
+            }
+          }
+        },
+        {
+          "name": "Get All Public Jobs (Excludes Direct Offers)",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/driverJob/getAllDriverJobs",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "driverJob", "getAllDriverJobs"]
+            }
+          }
+        },
+        {
+          "name": "Get Single Job Details",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/driverJob/singleJob/1",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "driverJob", "singleJob", "1"]
+            }
+          }
+        },
+        {
+          "name": "Get Jobs Posted by Company (HR ID)",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/driverJob/hrJobs/1",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "driverJob", "hrJobs", "1"]
+            }
+          }
+        },
+        {
+          "name": "Get Personal Offers for Driver (Driver ID)",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/driverJob/driverOffers/1",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "driverJob", "driverOffers", "1"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "4. Messaging Endpoints",
+      "item": [
+        {
+          "name": "Send Message (HR to Driver or Driver to HR)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"senderHrId\": 1,\n  \"senderDriverId\": null,\n  \"receiverDriverId\": 1,\n  \"receiverHrId\": null,\n  \"senderName\": \"Nordic Express HR\",\n  \"content\": \"Hello Mohammad, we reviewed your profile and would like to invite you for an interview!\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/message/send",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "message", "send"]
+            }
+          }
+        },
+        {
+          "name": "Get Messages for Driver",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/message/driver/1",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "message", "driver", "1"]
+            }
+          }
+        },
+        {
+          "name": "Get Messages for HR",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/message/hr/1",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "message", "hr", "1"]
+            }
+          }
+        },
+        {
+          "name": "Mark Message as Read",
+          "request": {
+            "method": "PATCH",
+            "url": {
+              "raw": "{{baseUrl}}/api/message/markRead/1",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "message", "markRead", "1"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "5. Notification Endpoints",
+      "item": [
+        {
+          "name": "Get Notifications for Driver",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/notification/driver/1",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "notification", "driver", "1"]
+            }
+          }
+        },
+        {
+          "name": "Mark Single Notification as Read",
+          "request": {
+            "method": "PATCH",
+            "url": {
+              "raw": "{{baseUrl}}/api/notification/markRead/1",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "notification", "markRead", "1"]
+            }
+          }
+        },
+        {
+          "name": "Mark All Notifications as Read for Driver",
+          "request": {
+            "method": "PATCH",
+            "url": {
+              "raw": "{{baseUrl}}/api/notification/markAllRead/1",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "notification", "markAllRead", "1"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "6. Search & Locations Endpoints",
+      "item": [
+        {
+          "name": "Search Marketplace (Drivers & Jobs)",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/search?q=Stockholm&type=drivers&limit=20",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "search"],
+              "query": [
+                {
+                  "key": "q",
+                  "value": "Stockholm"
+                },
+                {
+                  "key": "type",
+                  "value": "drivers"
+                },
+                {
+                  "key": "limit",
+                  "value": "20"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Available Locations",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/locations",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "locations"]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}
